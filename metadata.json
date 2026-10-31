@@ -1,6 +1,0 @@
-{
-  "name": "Gemini TTS Studio - 3 Gaya Suara",
-  "description": "Aplikasi Web Text-to-Speech bertenaga Gemini AI dengan 3 gaya ekspresi suara: Netral, Gembira, dan Formal Berita.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

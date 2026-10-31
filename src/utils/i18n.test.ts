@@ -21,15 +21,15 @@ test('All languages have identical key sets in translation schema', () => {
 
 test('getTranslation returns valid translations and falls back safely', () => {
   const en = getTranslation('en');
-  assert.equal(en.appTitle, 'Gemini Arabic TTS Studio');
+  assert.ok(en.appTitle.includes('Nāṭiq'));
 
   const ar = getTranslation('ar');
-  assert.ok(ar.appTitle.includes('جيميناي'));
+  assert.ok(ar.appTitle.includes('ناطق'));
 
   const id = getTranslation('id');
   assert.ok(id.stylesTitle.includes('Gaya'));
 
   // Fallback test
   const fallback = getTranslation('non_existent' as AppLanguage);
-  assert.equal(fallback.appTitle, 'Gemini Arabic TTS Studio');
+  assert.equal(fallback.appTitle, en.appTitle);
 });

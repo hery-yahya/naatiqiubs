@@ -124,14 +124,14 @@ export interface TranslationSchema {
 
 export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
   en: {
-    appTitle: 'Gemini Arabic TTS Studio',
+    appTitle: 'Nāṭiq — Arabic Fusha TTS',
     appBadge: 'Modern Standard Arabic',
     appSubtitle: 'Speech synthesis: Neutral, Cheerful, and Formal News Anchor',
     stylesBadge: '3 Vocal Styles',
     aiAssistantBtn: 'AI Assistant',
     modelLabel: 'Model:',
     connectedStatus: 'Gemini TTS Ready',
-    demoStatus: 'Demo Preview Mode',
+    demoStatus: 'API Key Not Set',
 
     stylesTitle: 'Select Vocal Expression Style',
     stylesSubtitle: 'Define the tone, inflection, and vocal energy for your Arabic script',
@@ -224,22 +224,22 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
 
     alertTitle: 'Notice',
     closeBtn: 'Close',
-    footerText: 'Gemini Arabic TTS Studio • Model gemini-3.8-flash-tts • Arabic Fusha 3 Styles',
+    footerText: 'Nāṭiq • IUBS • Gemini 3.8 Flash TTS • Arabic Fusha',
 
-    quotaExceededTitle: 'Gemini API Daily Free Quota Exceeded (429)',
-    quotaExceededDesc: 'The daily free-tier quota for gemini-3.8-flash-tts has been reached. The studio has seamlessly switched to simulated preview audio so you can test all features and controls. To restore unlimited live generation, attach a billing-enabled key in Settings > Secrets.',
-    quotaExceededBadge: 'Simulated Audio (Quota 429)',
+    quotaExceededTitle: 'Gemini API Quota Exceeded (429)',
+    quotaExceededDesc: 'The Gemini API quota has been used up, so no audio was generated. Wait a while (or until the daily quota resets) and try again. For a larger quota, enable billing on the Google AI Studio project that owns the API key.',
+    quotaExceededBadge: 'Quota exceeded (429)',
   },
 
   ar: {
-    appTitle: 'استوديو جيميناي للصوت العربي الفصيح',
+    appTitle: 'ناطق — الصوت العربي الفصيح',
     appBadge: 'العربية الفصحى',
     appSubtitle: 'تحويل النص إلى صوت فصيح: محايد، مبتهج، وإخباري رسمي',
     stylesBadge: '3 أنماط صوتية',
     aiAssistantBtn: 'مساعد الذكاء الاصطناعي',
     modelLabel: 'النموذج:',
     connectedStatus: 'Gemini TTS متصل',
-    demoStatus: 'وضع المعاينة التجريبي',
+    demoStatus: 'مفتاح API غير مضبوط',
 
     stylesTitle: 'اختر نمط الإلقاء الصوتي الفصيح',
     stylesSubtitle: 'حدد أسلوب النبرة والتلوين الصوتي ومخارج الحروف المناسبة لنصك',
@@ -332,22 +332,22 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
 
     alertTitle: 'تنبيه',
     closeBtn: 'إغلاق',
-    footerText: 'استوديو جيميناي للصوت العربي الفصيح • النموذج gemini-3.8-flash-tts • العربية الفصحى: محايد، مبتهج، إخباري رسمي',
+    footerText: 'ناطق • IUBS • Gemini 3.8 Flash TTS • العربية الفصحى',
 
-    quotaExceededTitle: 'تم استهلاك الحصة المجانية اليومية (429 Quota Exceeded)',
-    quotaExceededDesc: 'تم بلوغ الحد الأقصى اليومي للحساب المجاني للنموذج gemini-3.8-flash-tts. تم تحويل الصوت تلقائيًا إلى صوت معاينة تجريبي لاستمرار تجربة كافة الميزات. لاستئناف التوليد المباشر، يمكنك ربط مفتاح API مفعل الفواتير في قائمة Settings > Secrets.',
-    quotaExceededBadge: 'صوت معاينة تجريبي (نفاد الحصة 429)',
+    quotaExceededTitle: 'تم استهلاك حصة Gemini API (429)',
+    quotaExceededDesc: 'نفدت حصة Gemini API، لذلك لم يتم توليد أي صوت. انتظر قليلًا (أو حتى تتجدد الحصة اليومية) ثم حاول مرة أخرى. لحصة أكبر، فعّل الفوترة في مشروع Google AI Studio المرتبط بمفتاح API.',
+    quotaExceededBadge: 'نفدت الحصة (429)',
   },
 
   id: {
-    appTitle: 'Gemini Arabic TTS Studio',
+    appTitle: 'Nāṭiq — TTS Arab Fusha',
     appBadge: 'Bahasa Arab Fusha',
     appSubtitle: 'Sintesis Suara Arab Fusha: Netral, Gembira, dan Formal Berita',
     stylesBadge: '3 Gaya Suara',
     aiAssistantBtn: 'Asisten AI',
     modelLabel: 'Model:',
     connectedStatus: 'Gemini TTS Terhubung',
-    demoStatus: 'Mode Pratinjau Demo',
+    demoStatus: 'Kunci API Belum Dipasang',
 
     stylesTitle: 'Pilih Gaya Ekspresi Suara Arab Fusha',
     stylesSubtitle: 'Tentukan karakter intonasi, artikulasi, dan energi vokal untuk naskah Arab Anda',
@@ -440,11 +440,11 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
 
     alertTitle: 'Pemberitahuan',
     closeBtn: 'Tutup',
-    footerText: 'Gemini Arabic TTS Studio • Model gemini-3.8-flash-tts • Bahasa Arab Fusha: Netral, Gembira, Formal Berita',
+    footerText: 'Nāṭiq • IUBS • Gemini 3.8 Flash TTS • Bahasa Arab Fusha',
 
-    quotaExceededTitle: 'Batas Kuota Gratis Harian Gemini API Terlampaui (429)',
-    quotaExceededDesc: 'Batas harian gratis model gemini-3.8-flash-tts telah habis. Aplikasi otomatis beralih ke audio pratinjau simulasi agar seluruh alur tetap dapat diuji dengan lancar. Anda dapat memasang API key berbayar (pay-as-you-go) di Settings > Secrets untuk kuota penuh.',
-    quotaExceededBadge: 'Pratinjau Simulasi (Kuota 429)',
+    quotaExceededTitle: 'Kuota Gemini API Habis (429)',
+    quotaExceededDesc: 'Kuota Gemini API sedang habis, jadi suara tidak dibuat. Tunggu beberapa saat (atau sampai kuota harian pulih), lalu coba lagi. Untuk kuota lebih besar, aktifkan penagihan (billing) pada proyek Google AI Studio pemilik kunci API.',
+    quotaExceededBadge: 'Kuota habis (429)',
   },
 };
 

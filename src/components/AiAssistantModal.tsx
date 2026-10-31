@@ -79,7 +79,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           styleId: selectedStyle,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to generate Arabic script.');
       }
@@ -107,7 +107,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
           targetStyle: selectedStyle,
         }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to enhance text to Fusha.');
       }

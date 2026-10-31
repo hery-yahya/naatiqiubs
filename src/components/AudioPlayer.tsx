@@ -21,7 +21,6 @@ interface AudioPlayerProps {
   voiceName: string;
   textSnippet: string;
   playbackSpeed: number;
-  isSimulated?: boolean;
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -32,7 +31,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   voiceName,
   textSnippet,
   playbackSpeed,
-  isSimulated,
   t,
   language,
 }) => {
@@ -219,11 +217,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             {t.voiceLabel} <strong className="text-zinc-200">{voiceName}</strong>
           </span>
 
-          {isSimulated && (
-            <span className="text-[10px] text-amber-400 bg-amber-950/40 border border-amber-800/50 px-2 py-0.5 rounded">
-              {t.demoToneLabel}
-            </span>
-          )}
         </div>
 
         <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
