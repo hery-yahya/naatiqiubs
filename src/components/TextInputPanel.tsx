@@ -30,7 +30,7 @@ const ARABIC_STYLE_SAMPLES: Record<
       labelEn: 'Welcome Greeting',
       labelAr: 'أهلاً بكم (تحية هادئة)',
       labelId: 'Sambutan Hangat',
-      text: 'أَهْلًا وَسَهْلًا بِكُمْ فِي اسْتُودْيُو جِيمِينَاي لِتَحْوِيلِ النَّصِّ إِلَى صَوْتٍ، حَيْثُ نَسْعَى لِتَقْدِيمِ تَجْرِبَةٍ صَوْتِيَّةٍ عَرَبِيَّةٍ فَرِيدَةٍ.',
+      text: 'أَهْلًا وَسَهْلًا بِكُمْ فِي تَطْبِيقِ نَاطِقٍ لِتَحْوِيلِ النَّصِّ إِلَى صَوْتٍ، حَيْثُ نَسْعَى لِتَقْدِيمِ تَجْرِبَةٍ صَوْتِيَّةٍ عَرَبِيَّةٍ فَرِيدَةٍ.',
     },
     {
       labelEn: 'Audiobook Excerpt',
@@ -113,14 +113,17 @@ export const TextInputPanel: React.FC<TextInputPanelProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: text.trim() }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
       if (res.ok && data.success && data.textWithTashkeel) {
         onChangeText(data.textWithTashkeel);
         setTashkeelSuccess(true);
         setTimeout(() => setTashkeelSuccess(false), 2500);
+      } else {
+        window.alert(data.error || 'Gagal memberi harakat otomatis.');
       }
     } catch (err) {
       console.error('Tashkeel error:', err);
+      window.alert('Gagal menghubungi server untuk memberi harakat.');
     } finally {
       setIsTashkeeling(false);
     }

@@ -7,7 +7,6 @@ import {
   Pause,
   Download,
   Layers,
-  AlertTriangle,
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
@@ -20,8 +19,7 @@ export interface ComparisonResult {
   modelUsed?: string;
   success?: boolean;
   error?: string;
-  isSimulated?: boolean;
-  isQuotaExceeded?: boolean;
+  isQuota?: boolean;
 }
 
 interface ComparisonMatrixProps {
@@ -204,12 +202,6 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({
                   {styleDesc}
                 </p>
 
-                {res.isQuotaExceeded && (
-                  <div className="mb-2 p-1.5 rounded bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-300 flex items-center gap-1 font-cairo">
-                    <AlertTriangle className="w-3 h-3 shrink-0 text-amber-400" />
-                    <span>{t.quotaExceededBadge}</span>
-                  </div>
-                )}
               </div>
 
               {/* Player control */}

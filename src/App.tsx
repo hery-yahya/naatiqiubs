@@ -40,7 +40,7 @@ export default function App() {
     } catch {
       // ignore
     }
-    return 'en';
+    return 'id';
   });
 
   const t = getTranslation(language);
@@ -62,7 +62,6 @@ export default function App() {
     styleId: TTSStyleId;
     voiceName: string;
     textSnippet: string;
-    isSimulated?: boolean;
   } | null>(null);
 
   const [comparisonResults, setComparisonResults] = useState<ComparisonResult[] | null>(null);
@@ -116,6 +115,7 @@ export default function App() {
 
   const handleGenerate = async () => {
     setErrorMessage(null);
+    setShowQuotaBanner(false);
     const validation = validateTtsInput(text);
     if (!validation.isValid) {
       setErrorMessage(validation.error || 'Invalid text script.');
@@ -135,7 +135,7 @@ export default function App() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
       if (!res.ok || !data.success) {
         if (data.isQuota) {
           setShowQuotaBanner(true);
@@ -143,16 +143,11 @@ export default function App() {
         throw new Error(data.error || 'Failed to synthesize Arabic audio.');
       }
 
-      if (data.isQuotaExceeded) {
-        setShowQuotaBanner(true);
-      }
-
       const newAudioItem = {
         audioBase64: data.audioBase64,
         styleId: data.styleId as TTSStyleId,
         voiceName: data.voiceName,
         textSnippet: data.text,
-        isSimulated: data.isSimulated,
       };
 
       setCurrentAudio(newAudioItem);
@@ -177,6 +172,7 @@ export default function App() {
 
   const handleCompareAll = async () => {
     setErrorMessage(null);
+    setShowQuotaBanner(false);
     const validation = validateTtsInput(text);
     if (!validation.isValid) {
       setErrorMessage(validation.error || 'Invalid text script.');
@@ -194,7 +190,7 @@ export default function App() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
       if (!res.ok || !data.success) {
         if (data.isQuota) {
           setShowQuotaBanner(true);
@@ -277,7 +273,7 @@ export default function App() {
               <div className="flex items-center gap-2 pt-1 text-[11px] text-amber-400">
                 <KeyRound className="w-3.5 h-3.5" />
                 <span>
-                  Settings &gt; Secrets &bull; {TTS_MODEL}
+                  Cloudflare &gt; Settings &gt; Variables and Secrets &bull; {TTS_MODEL}
                 </span>
               </div>
             </div>
@@ -413,7 +409,6 @@ export default function App() {
                 voiceName={currentAudio.voiceName}
                 textSnippet={currentAudio.textSnippet}
                 playbackSpeed={speed}
-                isSimulated={currentAudio.isSimulated}
                 t={t}
                 language={language}
               />
