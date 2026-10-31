@@ -9,6 +9,8 @@ import {
   AVAILABLE_VOICES,
   TTS_MODEL,
   isArabicText,
+  applyTempoToText,
+  isTempoId,
 } from './tts-helper';
 
 test('STYLE_CONFIGS contains all 3 Arabic Fusha styles', () => {
@@ -75,4 +77,22 @@ test('estimateSpeechDurationSeconds and formatTime work accurately', () => {
   assert.equal(formatTime(0), '00:00');
   assert.equal(formatTime(65), '01:05');
   assert.equal(formatTime(125), '02:05');
+});
+
+test('applyTempoToText inserts pauses only for the word-by-word tempo', () => {
+  const text = 'ذَهَبَ الطَّالِبُ إِلَى الْمَدْرَسَةِ. ثُمَّ رَجَعَ';
+  assert.equal(applyTempoToText(text, 'normal'), text);
+  assert.equal(applyTempoToText(text, 'lambat'), text);
+  assert.equal(
+    applyTempoToText(text, 'eja'),
+    'ذَهَبَ <short pause> الطَّالِبُ <short pause> إِلَى <short pause> الْمَدْرَسَةِ. <long pause> ثُمَّ <short pause> رَجَعَ'
+  );
+  assert.equal(applyTempoToText('كَلِمَةٌ', 'eja'), 'كَلِمَةٌ');
+});
+
+test('buildSpeechDirective adds tempo instructions', () => {
+  assert.ok(!buildSpeechDirective('netral').includes('speaking slowly'));
+  assert.ok(buildSpeechDirective('netral', undefined, 'lambat').includes('speaking slowly'));
+  assert.ok(buildSpeechDirective('gembira', 'بصوت هادئ', 'eja').includes('word by word'));
+  assert.ok(isTempoId('eja') && !isTempoId('cepat'));
 });

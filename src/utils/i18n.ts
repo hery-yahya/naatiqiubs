@@ -63,6 +63,19 @@ export interface TranslationSchema {
   voiceFemale: string;
   voiceMale: string;
   speedLabel: string;
+  tempoNormal: string;
+  tempoSlow: string;
+  tempoWordByWord: string;
+  tempoHintNormal: string;
+  tempoHintSlow: string;
+  tempoHintWord: string;
+  loginTitle: string;
+  loginSubtitle: string;
+  loginPlaceholder: string;
+  loginButton: string;
+  loginChecking: string;
+  loginErrorWrong: string;
+  logoutBtn: string;
   customNuanceToggle: string;
   customNuanceClose: string;
   customNuanceLabel: string;
@@ -171,7 +184,20 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     voiceSubtitle: 'Gemini 3.8 Prebuilt Voices',
     voiceFemale: 'Female',
     voiceMale: 'Male',
-    speedLabel: 'Speaking Rate:',
+    speedLabel: 'Speaking Pace:',
+    tempoNormal: 'Normal',
+    tempoSlow: 'Slow',
+    tempoWordByWord: 'Slow + pauses',
+    tempoHintNormal: 'Natural speed.',
+    tempoHintSlow: 'Spoken slowly and clearly, good for beginners.',
+    tempoHintWord: 'Very slow with a pause after every word, for listening and dictation practice.',
+    loginTitle: 'Enter Password',
+    loginSubtitle: 'This app is for IUBS teachers and students. Enter the password from your teacher.',
+    loginPlaceholder: 'Password',
+    loginButton: 'Sign in',
+    loginChecking: 'Checking…',
+    loginErrorWrong: 'Incorrect password. Please try again.',
+    logoutBtn: 'Sign out',
     customNuanceToggle: 'Custom Vocal Direction (+)',
     customNuanceClose: 'Hide Custom Direction',
     customNuanceLabel: 'Additional Vocal Nuances (Custom Style Prompt):',
@@ -280,6 +306,19 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     voiceFemale: 'أنثى',
     voiceMale: 'ذكر',
     speedLabel: 'سرعة الإلقاء:',
+    tempoNormal: 'عادي',
+    tempoSlow: 'بطيء',
+    tempoWordByWord: 'بطيء مع وقفات',
+    tempoHintNormal: 'السرعة الطبيعية.',
+    tempoHintSlow: 'إلقاء بطيء وواضح، مناسب للمبتدئين.',
+    tempoHintWord: 'بطيء جدًا مع وقفة بعد كل كلمة، لتدريب الاستماع والإملاء.',
+    loginTitle: 'أدخل كلمة المرور',
+    loginSubtitle: 'هذا التطبيق خاص بمعلمي وطلاب IUBS. أدخل كلمة المرور من معلمك.',
+    loginPlaceholder: 'كلمة المرور',
+    loginButton: 'دخول',
+    loginChecking: 'جارٍ التحقق…',
+    loginErrorWrong: 'كلمة المرور غير صحيحة. حاول مرة أخرى.',
+    logoutBtn: 'خروج',
     customNuanceToggle: 'توجيهات إضافية للنبرة (+)',
     customNuanceClose: 'إخفاء التوجيهات الخاصة',
     customNuanceLabel: 'توجيهات صوتية إضافية (Custom Style Prompt):',
@@ -387,7 +426,20 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     voiceSubtitle: 'Suara Prebuilt Gemini 3.8',
     voiceFemale: 'Wanita',
     voiceMale: 'Pria',
-    speedLabel: 'Kecepatan Bicara:',
+    speedLabel: 'Tempo Bicara:',
+    tempoNormal: 'Normal',
+    tempoSlow: 'Lambat',
+    tempoWordByWord: 'Lambat + jeda',
+    tempoHintNormal: 'Kecepatan biasa.',
+    tempoHintSlow: 'Dibacakan pelan dan jelas, cocok untuk pemula.',
+    tempoHintWord: 'Sangat pelan dengan jeda setiap kata, untuk latihan menyimak dan imla.',
+    loginTitle: 'Masukkan Sandi',
+    loginSubtitle: 'Aplikasi ini khusus guru dan murid IUBS. Masukkan sandi dari guru Anda.',
+    loginPlaceholder: 'Sandi',
+    loginButton: 'Masuk',
+    loginChecking: 'Memeriksa…',
+    loginErrorWrong: 'Sandi salah. Silakan coba lagi.',
+    logoutBtn: 'Keluar',
     customNuanceToggle: 'Kustomisasi Nuansa Vokal (+)',
     customNuanceClose: 'Tutup Kustomisasi',
     customNuanceLabel: 'Petunjuk Nuansa Suara Tambahan (Custom Style Prompt):',
