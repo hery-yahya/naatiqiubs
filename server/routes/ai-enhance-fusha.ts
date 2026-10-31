@@ -1,5 +1,5 @@
-import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../../../server/gemini';
-import { STYLE_CONFIGS, TTSStyleId } from '../../../src/utils/tts-helper';
+import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../gemini';
+import { STYLE_CONFIGS, TTSStyleId } from '../../src/utils/tts-helper';
 
 // POST /api/ai/enhance-fusha — ubah teks (Indonesia, Inggris, 'amiyah, dll) menjadi Arab fusha berharakat.
 export const onRequestPost = async ({ request, env }: PagesContext): Promise<Response> => {

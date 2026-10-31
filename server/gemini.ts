@@ -1,5 +1,5 @@
 /**
- * Kode bersama untuk semua Cloudflare Functions di folder /functions.
+ * Kode bersama untuk semua fungsi server di folder server/routes.
  *
  * Memanggil Gemini langsung lewat REST API (tanpa SDK) supaya ringan
  * dan pasti berjalan di Cloudflare.
@@ -9,12 +9,17 @@ import { TTS_MODEL, AI_TEXT_MODEL } from '../src/utils/tts-helper';
 
 export { TTS_MODEL, AI_TEXT_MODEL };
 
-/** Variabel rahasia yang dipasang di Cloudflare (Settings > Variables and Secrets). */
+/**
+ * Pengaturan dari Cloudflare.
+ * - GEMINI_API_KEY: Secret yang dipasang di Settings > Variables and Secrets.
+ * - ASSETS: file tampilan (folder dist), disediakan otomatis oleh wrangler.jsonc.
+ */
 export interface Env {
   GEMINI_API_KEY?: string;
+  ASSETS?: { fetch(request: Request): Promise<Response> };
 }
 
-/** Bentuk konteks yang diberikan Cloudflare Pages ke setiap function. */
+/** Data yang diterima setiap fungsi di folder server/routes. */
 export interface PagesContext {
   request: Request;
   env: Env;

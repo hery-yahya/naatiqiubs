@@ -8,8 +8,8 @@ import {
   requireApiKey,
   synthesizeSpeech,
   TTS_MODEL,
-} from '../../../server/gemini';
-import { AVAILABLE_VOICES, buildSpeechDirective, TTSStyleId } from '../../../src/utils/tts-helper';
+} from '../gemini';
+import { AVAILABLE_VOICES, buildSpeechDirective, TTSStyleId } from '../../src/utils/tts-helper';
 
 const STYLES: TTSStyleId[] = ['netral', 'gembira', 'formal_berita'];
 

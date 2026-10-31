@@ -1,46 +1,45 @@
 # Nāṭiq (ناطق) — TTS Bahasa Arab Fusha
 
 Aplikasi web untuk mengubah teks Bahasa Arab fusha menjadi suara, dipakai untuk pembelajaran di IUBS.
-Suara dibuat oleh **Gemini 3.8 Flash TTS**, dan aplikasinya di-online-kan lewat **Cloudflare Pages**.
+Suara dibuat oleh **Gemini 3.8 Flash TTS**, dan aplikasinya di-online-kan lewat **Cloudflare Workers**.
 
 ---
 
 ## Cara memasang di Cloudflare (sekali saja)
+
+Aplikasi ini berjalan sebagai **Cloudflare Worker** (pengaturannya ada di file `wrangler.jsonc`).
 
 Yang dibutuhkan:
 - Akun GitHub (repo ini).
 - Akun Cloudflare gratis: <https://dash.cloudflare.com/sign-up>
 - Kunci API Gemini dari Google AI Studio: <https://aistudio.google.com/apikey>
 
-### Langkah 1 — Buat proyek Pages
-1. Masuk ke dashboard Cloudflare.
-2. Buka menu **Workers & Pages** → **Create** → pilih tab **Pages** → **Import an existing Git repository**.
-3. Hubungkan akun GitHub, lalu pilih repo **naatiqiubs**.
+### Langkah 1 — Hubungkan repo ke Cloudflare
+1. Di dashboard Cloudflare buka **Workers & Pages** → **Create application**.
+2. Pilih **Import a repository** (Workers), hubungkan GitHub, pilih repo **naatiqiubs**.
+3. Nama Worker: **naatiqiubs** (harus sama dengan `name` di `wrangler.jsonc`).
 
-### Langkah 2 — Isi pengaturan build
+### Langkah 2 — Pengaturan build
 | Kolom | Isi |
 |---|---|
-| Framework preset | **None** (atau Vite) |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Root directory | biarkan kosong |
+| Build command | `npm run build` (atau `bun run build`) |
+| Deploy command | `npx wrangler deploy` |
+| Root directory | `/` |
 
-Klik **Save and Deploy**. Tunggu sampai selesai (± 1–3 menit).
+Simpan dan tunggu deploy selesai (± 2–3 menit).
 
 ### Langkah 3 — Pasang kunci API Gemini
-1. Buka proyek Pages Anda → **Settings** → **Variables and Secrets**.
-2. Klik **Add** → pilih jenis **Secret**.
-3. Nama: `GEMINI_API_KEY` — Nilai: tempel kunci API Gemini Anda.
-4. Simpan untuk lingkungan **Production** (dan **Preview** bila perlu).
-5. Buka tab **Deployments** → pada deploy teratas klik **⋯** → **Retry deployment**,
-   supaya kunci yang baru dipasang ikut terbaca.
+1. Buka Worker **naatiqiubs** → **Settings** → **Variables and Secrets** (bagian *Runtime variables and secrets*).
+2. Klik **Add** → jenis **Secret** → nama `GEMINI_API_KEY` → tempel kunci Gemini → **Deploy**.
+
+Pilih jenis **Secret**, bukan *Text*: Secret tetap tersimpan walaupun aplikasi di-deploy ulang dari GitHub.
 
 ### Langkah 4 — Coba
-Buka alamat `https://<nama-proyek>.pages.dev`. Di pojok kanan atas harus muncul status
-**"Gemini TTS Terhubung"** (titik hijau). Kalau tertulis **"Kunci API Belum Dipasang"**,
+Buka alamat `https://naatiqiubs.<akun-anda>.workers.dev` (tombol **Visit**). Di pojok kanan atas
+harus muncul **"Gemini TTS Terhubung"** (titik hijau). Kalau tertulis **"Kunci API Belum Dipasang"**,
 ulangi Langkah 3.
 
-Setiap kali ada perubahan yang di-upload ke GitHub, Cloudflare otomatis memperbarui aplikasinya.
+Setiap perubahan yang masuk ke cabang `main` di GitHub otomatis diperbarui oleh Cloudflare.
 
 ---
 
@@ -63,14 +62,16 @@ Catatan kuota: tombol **"Bandingkan 3 Gaya"** memakai kuota 3 kali dalam sekali 
 ## Susunan file (untuk yang ingin tahu)
 
 ```
-functions/api/        ← "server" yang berjalan di Cloudflare (memanggil Gemini)
+wrangler.jsonc        ← pengaturan Cloudflare Worker
+server/worker.ts      ← pintu masuk: /api/* ke server, sisanya ke tampilan
+server/gemini.ts      ← cara memanggil Gemini + pesan error
+server/routes/        ← fungsi server (memanggil Gemini)
   status.ts             cek apakah kunci API sudah terpasang
-  tts/generate.ts       teks → suara (1 gaya)
-  tts/compare-all.ts    teks → suara (3 gaya sekaligus)
-  ai/tashkeel.ts        beri harakat otomatis
-  ai/generate-script.ts buat naskah dari topik
-  ai/enhance-fusha.ts   ubah teks Indonesia/Inggris/'amiyah ke fusha
-server/gemini.ts      ← kode bersama: cara memanggil Gemini + pesan error
+  tts-generate.ts       teks → suara (1 gaya)
+  tts-compare-all.ts    teks → suara (3 gaya sekaligus)
+  ai-tashkeel.ts        beri harakat otomatis
+  ai-generate-script.ts buat naskah dari topik
+  ai-enhance-fusha.ts   ubah teks Indonesia/Inggris/'amiyah ke fusha
 src/                  ← tampilan aplikasi (React)
 ```
 
@@ -81,7 +82,7 @@ Kunci API hanya disimpan di Cloudflare dan tidak pernah dikirim ke browser pengg
 ```bash
 npm install
 cp .dev.vars.example .dev.vars   # isi GEMINI_API_KEY
-npm run preview                  # build + jalankan Cloudflare Pages secara lokal
+npm run preview                  # build + jalankan Worker secara lokal
 ```
 
 `npm run dev` hanya menjalankan tampilan; fitur suara butuh `npm run preview`.

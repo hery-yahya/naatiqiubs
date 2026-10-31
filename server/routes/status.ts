@@ -1,4 +1,4 @@
-import { json, PagesContext, TTS_MODEL, AI_TEXT_MODEL } from '../../server/gemini';
+import { json, PagesContext, TTS_MODEL, AI_TEXT_MODEL } from '../gemini';
 import { STYLE_CONFIGS } from '../../src/utils/tts-helper';
 
 // GET /api/status — dipakai tampilan untuk menampilkan status "Terhubung".

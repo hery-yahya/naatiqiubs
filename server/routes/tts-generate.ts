@@ -7,8 +7,8 @@ import {
   requireApiKey,
   synthesizeSpeech,
   TTS_MODEL,
-} from '../../../server/gemini';
-import { AVAILABLE_VOICES, buildSpeechDirective, STYLE_CONFIGS, TTSStyleId } from '../../../src/utils/tts-helper';
+} from '../gemini';
+import { AVAILABLE_VOICES, buildSpeechDirective, STYLE_CONFIGS, TTSStyleId } from '../../src/utils/tts-helper';
 
 // POST /api/tts/generate — ubah teks Arab menjadi suara dengan satu gaya.
 export const onRequestPost = async ({ request, env }: PagesContext): Promise<Response> => {

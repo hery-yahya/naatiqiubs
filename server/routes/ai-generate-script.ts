@@ -1,5 +1,5 @@
-import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../../../server/gemini';
-import { STYLE_CONFIGS, TTSStyleId } from '../../../src/utils/tts-helper';
+import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../gemini';
+import { STYLE_CONFIGS, TTSStyleId } from '../../src/utils/tts-helper';
 
 // POST /api/ai/generate-script — buat naskah Arab fusha berharakat dari sebuah topik.
 export const onRequestPost = async ({ request, env }: PagesContext): Promise<Response> => {

@@ -3,5 +3,5 @@
 # JANGAN upload file .dev.vars ke GitHub (sudah dikecualikan di .gitignore).
 #
 # Untuk versi online, kunci dipasang di Cloudflare:
-# Pages > proyek Anda > Settings > Variables and Secrets > tambah Secret "GEMINI_API_KEY".
+# Workers & Pages > naatiqiubs > Settings > Variables and Secrets > tambah Secret "GEMINI_API_KEY".
 GEMINI_API_KEY="tempel-kunci-api-gemini-di-sini"

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite build && npx wrangler pages dev dist",
+    "preview": "vite build && npx wrangler dev",
     "lint": "tsc --noEmit",
     "clean": "rm -rf dist"
   },

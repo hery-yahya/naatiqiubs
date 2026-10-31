@@ -1,4 +1,4 @@
-import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../../../server/gemini';
+import { errorResponse, generateText, json, PagesContext, readJson, readText, requireApiKey } from '../gemini';
 
 // POST /api/ai/tashkeel — beri harakat lengkap pada teks Arab.
 export const onRequestPost = async ({ request, env }: PagesContext): Promise<Response> => {
