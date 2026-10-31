@@ -12,10 +12,13 @@ export { TTS_MODEL, AI_TEXT_MODEL };
 /**
  * Pengaturan dari Cloudflare.
  * - GEMINI_API_KEY: Secret yang dipasang di Settings > Variables and Secrets.
+ * - APP_PASSWORD: Secret berisi sandi masuk aplikasi (opsional, tapi sangat disarankan).
  * - ASSETS: file tampilan (folder dist), disediakan otomatis oleh wrangler.jsonc.
  */
 export interface Env {
   GEMINI_API_KEY?: string;
+  /** Sandi masuk aplikasi (Secret). Kalau kosong, aplikasi terbuka tanpa sandi. */
+  APP_PASSWORD?: string;
   ASSETS?: { fetch(request: Request): Promise<Response> };
 }
 

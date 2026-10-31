@@ -2,11 +2,14 @@
  * Pintu masuk aplikasi di Cloudflare Workers.
  *
  * - Alamat yang diawali /api/ diteruskan ke fungsi server (memanggil Gemini).
+ *   Semua kecuali /api/status dan /api/login wajib menyertakan sandi (kalau APP_PASSWORD dipasang).
  * - Alamat lain dilayani dari file tampilan (folder dist).
  */
 
+import { checkAuth } from './auth';
 import { Env, json, PagesContext } from './gemini';
 import { onRequestGet as status } from './routes/status';
+import { onRequestPost as login } from './routes/login';
 import { onRequestPost as ttsGenerate } from './routes/tts-generate';
 import { onRequestPost as ttsCompareAll } from './routes/tts-compare-all';
 import { onRequestPost as aiTashkeel } from './routes/ai-tashkeel';
@@ -15,8 +18,10 @@ import { onRequestPost as aiEnhanceFusha } from './routes/ai-enhance-fusha';
 
 type Handler = (ctx: PagesContext) => Promise<Response>;
 
-const ROUTES: Record<string, { method: 'GET' | 'POST'; handler: Handler }> = {
-  '/api/status': { method: 'GET', handler: status },
+// public: true = boleh dipakai tanpa sandi.
+const ROUTES: Record<string, { method: 'GET' | 'POST'; handler: Handler; public?: boolean }> = {
+  '/api/status': { method: 'GET', handler: status, public: true },
+  '/api/login': { method: 'POST', handler: login, public: true },
   '/api/tts/generate': { method: 'POST', handler: ttsGenerate },
   '/api/tts/compare-all': { method: 'POST', handler: ttsCompareAll },
   '/api/ai/tashkeel': { method: 'POST', handler: aiTashkeel },
@@ -36,6 +41,10 @@ export default {
       }
       if (request.method !== route.method) {
         return json({ success: false, error: 'Metode tidak diizinkan.', code: 'METHOD_NOT_ALLOWED' }, 405);
+      }
+      if (!route.public) {
+        const denied = await checkAuth(request, env);
+        if (denied) return denied;
       }
       return route.handler({ request, env });
     }

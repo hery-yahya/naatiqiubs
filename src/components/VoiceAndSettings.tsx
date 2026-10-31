@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { User, Sliders, Sparkles } from 'lucide-react';
-import { AVAILABLE_VOICES, VoiceOption, TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
+import { User, Gauge, Sparkles } from 'lucide-react';
+import { AVAILABLE_VOICES, VoiceOption, TTSStyleId, STYLE_CONFIGS, TempoId } from '../utils/tts-helper';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 interface VoiceAndSettingsProps {
   selectedVoice: string;
   onSelectVoice: (voice: string) => void;
-  speed: number;
-  onChangeSpeed: (speed: number) => void;
+  tempo: TempoId;
+  onChangeTempo: (tempo: TempoId) => void;
   customDirective: string;
   onChangeCustomDirective: (val: string) => void;
   activeStyle: TTSStyleId;
@@ -18,8 +18,8 @@ interface VoiceAndSettingsProps {
 export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
   selectedVoice,
   onSelectVoice,
-  speed,
-  onChangeSpeed,
+  tempo,
+  onChangeTempo,
   customDirective,
   onChangeCustomDirective,
   activeStyle,
@@ -29,7 +29,12 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const activeStyleConfig = STYLE_CONFIGS[activeStyle];
 
-  const speedOptions = [0.8, 1.0, 1.2, 1.5];
+  const tempoOptions: { id: TempoId; label: string; hint: string }[] = [
+    { id: 'normal', label: t.tempoNormal, hint: t.tempoHintNormal },
+    { id: 'lambat', label: t.tempoSlow, hint: t.tempoHintSlow },
+    { id: 'eja', label: t.tempoWordByWord, hint: t.tempoHintWord },
+  ];
+  const activeTempoHint = tempoOptions.find((o) => o.id === tempo)?.hint || '';
   const isArabicUI = language === 'ar';
 
   return (
@@ -111,28 +116,32 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
           isArabicUI ? 'flex-row-reverse' : ''
         }`}
       >
-        {/* Playback speed */}
-        <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
-          <span className="text-xs text-zinc-400 flex items-center gap-1 font-cairo">
-            <Sliders className="w-3.5 h-3.5 text-zinc-500" />
-            {t.speedLabel}
-          </span>
-          <div className="inline-flex rounded-lg bg-zinc-950 p-0.5 border border-zinc-800">
-            {speedOptions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => onChangeSpeed(s)}
-                className={`px-2 py-0.5 text-[11px] rounded font-medium transition-colors cursor-pointer ${
-                  speed === s
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
-              >
-                {s}x
-              </button>
-            ))}
+        {/* Tempo bicara (dibuat oleh Gemini) */}
+        <div className={`flex flex-col gap-1 ${isArabicUI ? 'items-end' : 'items-start'}`}>
+          <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
+            <span className="text-xs text-zinc-400 flex items-center gap-1 font-cairo">
+              <Gauge className="w-3.5 h-3.5 text-zinc-500" />
+              {t.speedLabel}
+            </span>
+            <div className="inline-flex rounded-lg bg-zinc-950 p-0.5 border border-zinc-800">
+              {tempoOptions.map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => onChangeTempo(opt.id)}
+                  title={opt.hint}
+                  className={`px-2.5 py-1 text-[11px] rounded font-medium transition-colors cursor-pointer font-cairo ${
+                    tempo === opt.id
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
           </div>
+          <span className="text-[10px] text-zinc-500 font-cairo">{activeTempoHint}</span>
         </div>
 
         {/* Toggle custom nuance */}

@@ -9,7 +9,14 @@ import {
   synthesizeSpeech,
   TTS_MODEL,
 } from '../gemini';
-import { AVAILABLE_VOICES, buildSpeechDirective, TTSStyleId } from '../../src/utils/tts-helper';
+import {
+  applyTempoToText,
+  AVAILABLE_VOICES,
+  buildSpeechDirective,
+  isTempoId,
+  TempoId,
+  TTSStyleId,
+} from '../../src/utils/tts-helper';
 
 const STYLES: TTSStyleId[] = ['netral', 'gembira', 'formal_berita'];
 
@@ -20,13 +27,15 @@ export const onRequestPost = async ({ request, env }: PagesContext): Promise<Res
     const body = await readJson(request);
     const text = readText(body.text, 'Silakan tulis teks bahasa Arab fusha terlebih dahulu.');
     const voiceName = AVAILABLE_VOICES.some((v) => v.id === body.voiceName) ? body.voiceName : 'Kore';
+    const tempo: TempoId = isTempoId(body.tempo) ? body.tempo : 'normal';
+    const spokenText = applyTempoToText(text, tempo);
     const apiKey = requireApiKey(env);
 
     const results = await Promise.all(
       STYLES.map(async (styleId) => {
-        const directive = buildSpeechDirective(styleId);
+        const directive = buildSpeechDirective(styleId, undefined, tempo);
         try {
-          const { audioBase64, mimeType } = await synthesizeSpeech(apiKey, text, directive, voiceName);
+          const { audioBase64, mimeType } = await synthesizeSpeech(apiKey, spokenText, directive, voiceName);
           return { styleId, success: true, audioBase64, mimeType, directive, modelUsed: TTS_MODEL };
         } catch (err) {
           const e = err instanceof GeminiError ? err : null;
@@ -51,6 +60,7 @@ export const onRequestPost = async ({ request, env }: PagesContext): Promise<Res
       success: true,
       text,
       voiceName,
+      tempo,
       modelUsed: TTS_MODEL,
       results,
       isQuotaExceeded: results.some((r) => (r as { isQuota?: boolean }).isQuota),

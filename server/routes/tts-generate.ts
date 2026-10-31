@@ -8,7 +8,15 @@ import {
   synthesizeSpeech,
   TTS_MODEL,
 } from '../gemini';
-import { AVAILABLE_VOICES, buildSpeechDirective, STYLE_CONFIGS, TTSStyleId } from '../../src/utils/tts-helper';
+import {
+  applyTempoToText,
+  AVAILABLE_VOICES,
+  buildSpeechDirective,
+  isTempoId,
+  STYLE_CONFIGS,
+  TempoId,
+  TTSStyleId,
+} from '../../src/utils/tts-helper';
 
 // POST /api/tts/generate — ubah teks Arab menjadi suara dengan satu gaya.
 export const onRequestPost = async ({ request, env }: PagesContext): Promise<Response> => {
@@ -20,10 +28,16 @@ export const onRequestPost = async ({ request, env }: PagesContext): Promise<Res
     const voiceName = AVAILABLE_VOICES.some((v) => v.id === body.voiceName) ? body.voiceName : 'Kore';
     const customDirective =
       typeof body.customDirective === 'string' ? body.customDirective.slice(0, 500) : undefined;
-    const directive = buildSpeechDirective(styleId, customDirective);
+    const tempo: TempoId = isTempoId(body.tempo) ? body.tempo : 'normal';
+    const directive = buildSpeechDirective(styleId, customDirective, tempo);
 
     const apiKey = requireApiKey(env);
-    const { audioBase64, mimeType } = await synthesizeSpeech(apiKey, text, directive, voiceName);
+    const { audioBase64, mimeType } = await synthesizeSpeech(
+      apiKey,
+      applyTempoToText(text, tempo),
+      directive,
+      voiceName
+    );
 
     return json({
       success: true,
@@ -31,6 +45,7 @@ export const onRequestPost = async ({ request, env }: PagesContext): Promise<Res
       mimeType,
       styleId,
       voiceName,
+      tempo,
       text,
       directive,
       modelUsed: TTS_MODEL,

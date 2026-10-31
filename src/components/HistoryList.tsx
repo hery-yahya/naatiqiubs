@@ -11,6 +11,7 @@ import {
   Newspaper,
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
+import type { TempoId } from '../utils/tts-helper';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 export interface HistoryItem {
@@ -20,6 +21,7 @@ export interface HistoryItem {
   styleId: TTSStyleId;
   voiceName: string;
   audioBase64: string;
+  tempo?: TempoId;
 }
 
 interface HistoryListProps {

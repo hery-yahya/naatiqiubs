@@ -22,13 +22,23 @@ import { AudioPlayer } from './components/AudioPlayer';
 import { ComparisonMatrix, ComparisonResult } from './components/ComparisonMatrix';
 import { HistoryList, HistoryItem } from './components/HistoryList';
 import { AiAssistantModal } from './components/AiAssistantModal';
+import { LoginScreen } from './components/LoginScreen';
 import {
   TTSStyleId,
   STYLE_CONFIGS,
   validateTtsInput,
   TTS_MODEL,
+  TempoId,
 } from './utils/tts-helper';
 import { AppLanguage, getTranslation } from './utils/i18n';
+import {
+  apiPost,
+  AUTH_REQUIRED_EVENT,
+  clearStoredPassword,
+  getStoredPassword,
+  verifyPassword,
+} from './utils/api';
+import { addHistoryItem, clearHistoryStore, loadHistory, MAX_HISTORY_ITEMS } from './utils/history-store';
 
 export default function App() {
   const [language, setLanguage] = useState<AppLanguage>(() => {
@@ -48,7 +58,7 @@ export default function App() {
   const [selectedStyle, setSelectedStyle] = useState<TTSStyleId>('netral');
   const [selectedVoice, setSelectedVoice] = useState<string>('Kore');
   const [text, setText] = useState<string>(STYLE_CONFIGS.netral.sampleText);
-  const [speed, setSpeed] = useState<number>(1.0);
+  const [tempo, setTempo] = useState<TempoId>('normal');
   const [customDirective, setCustomDirective] = useState<string>('');
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -79,39 +89,61 @@ export default function App() {
     }
   };
 
-  // Load history from localStorage
-  const [history, setHistory] = useState<HistoryItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('gemini_arabic_tts_history');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  // Status masuk: 'checking' = sedang memeriksa, 'locked' = perlu sandi, 'open' = boleh dipakai
+  const [authState, setAuthState] = useState<'checking' | 'locked' | 'open'>('checking');
+  const [passwordRequired, setPasswordRequired] = useState(false);
 
-  // Save history
-  useEffect(() => {
-    try {
-      localStorage.setItem('gemini_arabic_tts_history', JSON.stringify(history));
-    } catch (e) {
-      console.warn('Could not save history to localStorage', e);
-    }
-  }, [history]);
+  // Riwayat audio (disimpan di IndexedDB agar tidak cepat penuh)
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  // Fetch status on mount
   useEffect(() => {
-    fetch('/api/status')
-      .then((res) => res.json())
-      .then((data) => {
+    loadHistory().then(setHistory);
+  }, []);
+
+  // Cek status server dan sandi saat aplikasi dibuka
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (cancelled) return;
         if (data.status === 'ok') {
           setHasApiKey(data.hasKey);
           if (data.model) setActiveModel(data.model);
         }
-      })
-      .catch((err) => {
+        const needsPassword = Boolean(data.passwordRequired);
+        setPasswordRequired(needsPassword);
+        if (!needsPassword) {
+          setAuthState('open');
+          return;
+        }
+        const saved = getStoredPassword();
+        const ok = saved ? await verifyPassword(saved) : false;
+        if (cancelled) return;
+        if (!ok) clearStoredPassword();
+        setAuthState(ok ? 'open' : 'locked');
+      } catch (err) {
         console.warn('Status check warning:', err);
-      });
+        if (!cancelled) setAuthState('open');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  // Kalau server menolak sandi (misalnya sandi diganti), kembali ke layar masuk
+  useEffect(() => {
+    const onAuthRequired = () => setAuthState('locked');
+    window.addEventListener(AUTH_REQUIRED_EVENT, onAuthRequired);
+    return () => window.removeEventListener(AUTH_REQUIRED_EVENT, onAuthRequired);
+  }, []);
+
+  const handleLogout = () => {
+    clearStoredPassword();
+    setAuthState('locked');
+  };
 
   const handleGenerate = async () => {
     setErrorMessage(null);
@@ -124,18 +156,13 @@ export default function App() {
 
     setIsGenerating(true);
     try {
-      const res = await fetch('/api/tts/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { res, data } = await apiPost('/api/tts/generate', {
           text: text.trim(),
           styleId: selectedStyle,
           voiceName: selectedVoice,
           customDirective: customDirective.trim() || undefined,
-        }),
-      });
-
-      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
+          tempo,
+        });
       if (!res.ok || !data.success) {
         if (data.isQuota) {
           setShowQuotaBanner(true);
@@ -160,8 +187,10 @@ export default function App() {
         styleId: data.styleId as TTSStyleId,
         voiceName: data.voiceName,
         audioBase64: data.audioBase64,
+        tempo: data.tempo as TempoId,
       };
-      setHistory((prev) => [newHistoryEntry, ...prev.slice(0, 19)]);
+      setHistory((prev) => [newHistoryEntry, ...prev].slice(0, MAX_HISTORY_ITEMS));
+      addHistoryItem(newHistoryEntry);
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message || 'Error occurred while contacting Gemini TTS.');
@@ -181,16 +210,11 @@ export default function App() {
 
     setIsComparing(true);
     try {
-      const res = await fetch('/api/tts/compare-all', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { res, data } = await apiPost('/api/tts/compare-all', {
           text: text.trim(),
           voiceName: selectedVoice,
-        }),
-      });
-
-      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
+          tempo,
+        });
       if (!res.ok || !data.success) {
         if (data.isQuota) {
           setShowQuotaBanner(true);
@@ -221,11 +245,7 @@ export default function App() {
 
   const handleClearHistory = () => {
     setHistory([]);
-    try {
-      localStorage.removeItem('gemini_arabic_tts_history');
-    } catch {
-      // ignore
-    }
+    clearHistoryStore();
   };
 
   const isArabicUI = language === 'ar';
@@ -235,6 +255,17 @@ export default function App() {
       : selectedStyle === 'gembira'
       ? t.styleGembiraName
       : t.styleFormalName;
+
+  if (authState !== 'open') {
+    return (
+      <LoginScreen
+        isChecking={authState === 'checking'}
+        onSuccess={() => setAuthState('open')}
+        t={t}
+        language={language}
+      />
+    );
+  }
 
   return (
     <div
@@ -392,8 +423,8 @@ export default function App() {
             <VoiceAndSettings
               selectedVoice={selectedVoice}
               onSelectVoice={setSelectedVoice}
-              speed={speed}
-              onChangeSpeed={setSpeed}
+              tempo={tempo}
+              onChangeTempo={setTempo}
               customDirective={customDirective}
               onChangeCustomDirective={setCustomDirective}
               activeStyle={selectedStyle}
@@ -408,7 +439,7 @@ export default function App() {
                 styleId={currentAudio.styleId}
                 voiceName={currentAudio.voiceName}
                 textSnippet={currentAudio.textSnippet}
-                playbackSpeed={speed}
+                playbackSpeed={1}
                 t={t}
                 language={language}
               />
@@ -453,6 +484,7 @@ export default function App() {
             });
             setSelectedStyle(item.styleId);
             setSelectedVoice(item.voiceName);
+            if (item.tempo) setTempo(item.tempo);
           }}
           onLoadTextToEditor={(newText) => setText(newText)}
           t={t}
@@ -473,6 +505,15 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-zinc-900 mt-12 py-6 text-center text-xs text-zinc-600 font-cairo">
         <p>{t.footerText}</p>
+        {passwordRequired && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-2 text-zinc-500 hover:text-zinc-300 underline cursor-pointer"
+          >
+            {t.logoutBtn}
+          </button>
+        )}
       </footer>
     </div>
   );

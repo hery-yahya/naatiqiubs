@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, validateTtsInput } from '../utils/tts-helper';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
+import { apiPost } from '../utils/api';
 
 interface TextInputPanelProps {
   text: string;
@@ -108,12 +109,7 @@ export const TextInputPanel: React.FC<TextInputPanelProps> = ({
     setTashkeelSuccess(false);
 
     try {
-      const res = await fetch('/api/ai/tashkeel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim() }),
-      });
-      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
+      const { res, data } = await apiPost('/api/ai/tashkeel', { text: text.trim() });
       if (res.ok && data.success && data.textWithTashkeel) {
         onChangeText(data.textWithTashkeel);
         setTashkeelSuccess(true);

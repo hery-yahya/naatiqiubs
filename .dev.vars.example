@@ -5,3 +5,6 @@
 # Untuk versi online, kunci dipasang di Cloudflare:
 # Workers & Pages > naatiqiubs > Settings > Variables and Secrets > tambah Secret "GEMINI_API_KEY".
 GEMINI_API_KEY="tempel-kunci-api-gemini-di-sini"
+
+# Sandi masuk aplikasi (opsional). Kosongkan/hapus baris ini untuk membuka tanpa sandi.
+APP_PASSWORD="sandi-percobaan"

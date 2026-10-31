@@ -34,6 +34,15 @@ Simpan dan tunggu deploy selesai (± 2–3 menit).
 
 Pilih jenis **Secret**, bukan *Text*: Secret tetap tersimpan walaupun aplikasi di-deploy ulang dari GitHub.
 
+### Langkah 3b — Pasang sandi masuk (sangat disarankan)
+Tanpa sandi, siapa pun yang tahu alamat aplikasi bisa memakai kuota Gemini Anda.
+1. Di tempat yang sama (**Settings → Variables and Secrets**) klik **Add**.
+2. Key: `APP_PASSWORD` — Value: sandi pilihan Anda — centang **Secret** → **Add variable and deploy**.
+3. Bagikan sandi ini kepada guru dan murid. Perangkat yang sudah pernah masuk akan diingat.
+
+Untuk **mengganti sandi**, ubah nilai `APP_PASSWORD` lalu deploy. Semua perangkat akan diminta masuk ulang.
+Untuk **membuka tanpa sandi**, hapus `APP_PASSWORD`.
+
 ### Langkah 4 — Coba
 Buka alamat `https://naatiqiubs.<akun-anda>.workers.dev` (tombol **Visit**). Di pojok kanan atas
 harus muncul **"Gemini TTS Terhubung"** (titik hijau). Kalau tertulis **"Kunci API Belum Dipasang"**,
@@ -52,10 +61,23 @@ Setiap perubahan yang masuk ke cabang `main` di GitHub otomatis diperbarui oleh 
 | Kuota Gemini API sedang habis (429) | Batas pemakaian tercapai | Tunggu, atau aktifkan billing di proyek Google AI Studio |
 | Teks terlalu panjang | Lebih dari 2.000 karakter | Bagi teks menjadi beberapa bagian |
 | Gemini tidak bisa memproses teks ini | Isi teks ditolak Gemini | Periksa/persingkat teks |
+| Sandi salah atau belum dimasukkan | Sandi diganti atau salah ketik | Masuk ulang dengan sandi terbaru |
 
 Aplikasi **tidak pernah** membuat suara pengganti palsu. Kalau gagal, yang muncul adalah pesan error.
 
 Catatan kuota: tombol **"Bandingkan 3 Gaya"** memakai kuota 3 kali dalam sekali klik.
+
+## Tempo bicara
+
+| Pilihan | Cara kerja | Cocok untuk |
+|---|---|---|
+| Normal | Kecepatan biasa | Mendengar naskah utuh |
+| Lambat | Gemini diminta berbicara pelan dan jelas | Murid pemula |
+| Lambat + jeda | Sangat pelan, ada jeda setelah setiap kata (tanda `<short pause>` disisipkan otomatis) | Latihan menyimak dan imla |
+
+Tempo dibuat oleh Gemini saat suara dibuat, jadi setelah mengganti tempo klik **Generate Suara** lagi.
+
+Riwayat menyimpan 30 audio terakhir di browser masing-masing perangkat.
 
 ---
 
@@ -65,8 +87,10 @@ Catatan kuota: tombol **"Bandingkan 3 Gaya"** memakai kuota 3 kali dalam sekali 
 wrangler.jsonc        ← pengaturan Cloudflare Worker
 server/worker.ts      ← pintu masuk: /api/* ke server, sisanya ke tampilan
 server/gemini.ts      ← cara memanggil Gemini + pesan error
+server/auth.ts        ← pemeriksaan sandi masuk (APP_PASSWORD)
 server/routes/        ← fungsi server (memanggil Gemini)
-  status.ts             cek apakah kunci API sudah terpasang
+  status.ts             cek apakah kunci API & sandi sudah terpasang
+  login.ts              periksa sandi dari layar masuk
   tts-generate.ts       teks → suara (1 gaya)
   tts-compare-all.ts    teks → suara (3 gaya sekaligus)
   ai-tashkeel.ts        beri harakat otomatis

@@ -1,5 +1,45 @@
 export type TTSStyleId = 'netral' | 'gembira' | 'formal_berita';
 
+/**
+ * Tempo bicara yang dibuat langsung oleh Gemini (bukan sekadar mempercepat/memperlambat pemutaran).
+ * - normal : tempo biasa
+ * - lambat : bicara pelan dan jelas
+ * - eja    : sangat pelan, berhenti sejenak setelah setiap kata (untuk latihan menyimak)
+ */
+export type TempoId = 'normal' | 'lambat' | 'eja';
+
+export const TEMPO_IDS: TempoId[] = ['normal', 'lambat', 'eja'];
+
+export const TEMPO_DIRECTIVES: Record<TempoId, string> = {
+  normal: '',
+  lambat:
+    'تحدث ببطء وبوضوح تام، بإيقاع هادئ مناسب للمتعلمين المبتدئين، مع نطق كل حرف من مخرجه. (speaking slowly and clearly)',
+  eja:
+    'تحدث ببطء شديد كلمةً كلمةً، وانطق كل كلمة بوضوح تام مع وقفة قصيرة بعد كل كلمة، كمعلم يملي على طلاب مبتدئين. (speaking very slowly, word by word)',
+};
+
+export function isTempoId(value: unknown): value is TempoId {
+  return typeof value === 'string' && (TEMPO_IDS as string[]).includes(value);
+}
+
+/**
+ * Untuk tempo "eja": sisipkan tanda jeda Gemini di antara kata.
+ * Setelah akhir kalimat (. ! ? ؟ ؛) dipakai jeda panjang, setelah koma (، ,) jeda sedang-panjang,
+ * selain itu jeda pendek.
+ */
+export function applyTempoToText(text: string, tempo: TempoId): string {
+  if (tempo !== 'eja') return text;
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return text.trim();
+  return words
+    .map((word, i) => {
+      if (i === words.length - 1) return word;
+      if (/[.!?؟؛:]$/.test(word)) return `${word} <long pause>`;
+      return `${word} <short pause>`;
+    })
+    .join(' ');
+}
+
 export const TTS_MODEL = 'gemini-3.8-flash-tts';
 export const AI_TEXT_MODEL = 'gemini-3.8-flash';
 
@@ -133,12 +173,20 @@ export function validateTtsInput(text: string, maxChars = 2000): ValidationResul
   return { isValid: true, charCount, wordCount };
 }
 
-export function buildSpeechDirective(styleId: TTSStyleId, customStylePrompt?: string): string {
-  const base = STYLE_CONFIGS[styleId]?.directive || STYLE_CONFIGS.netral.directive;
+export function buildSpeechDirective(
+  styleId: TTSStyleId,
+  customStylePrompt?: string,
+  tempo: TempoId = 'normal'
+): string {
+  let directive = STYLE_CONFIGS[styleId]?.directive || STYLE_CONFIGS.netral.directive;
   if (customStylePrompt && customStylePrompt.trim()) {
-    return `${base}. توجيهات إضافية: ${customStylePrompt.trim()}`;
+    directive = `${directive}. توجيهات إضافية: ${customStylePrompt.trim()}`;
   }
-  return base;
+  const tempoDirective = TEMPO_DIRECTIVES[tempo] || '';
+  if (tempoDirective) {
+    directive = `${directive} ${tempoDirective}`;
+  }
+  return directive;
 }
 
 export function estimateSpeechDurationSeconds(text: string, speedMultiplier = 1): number {

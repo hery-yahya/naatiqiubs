@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
+import { apiPost } from '../utils/api';
 
 interface AiAssistantModalProps {
   isOpen: boolean;
@@ -71,15 +72,10 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     setGeneratedResult(null);
 
     try {
-      const res = await fetch('/api/ai/generate-script', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { res, data } = await apiPost('/api/ai/generate-script', {
           prompt: topicPrompt.trim(),
           styleId: selectedStyle,
-        }),
-      });
-      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
+        });
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to generate Arabic script.');
       }
@@ -99,15 +95,10 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
     setGeneratedResult(null);
 
     try {
-      const res = await fetch('/api/ai/enhance-fusha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      const { res, data } = await apiPost('/api/ai/enhance-fusha', {
           text: inputToEnhance.trim(),
           targetStyle: selectedStyle,
-        }),
-      });
-      const data = await res.json().catch(() => ({ error: `Server tidak merespons dengan benar (HTTP ${res.status}).` }));
+        });
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to enhance text to Fusha.');
       }
