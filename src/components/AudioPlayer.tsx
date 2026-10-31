@@ -12,7 +12,8 @@ import {
   Check,
   Share2,
 } from 'lucide-react';
-import { TTSStyleId, STYLE_CONFIGS, formatTime } from '../utils/tts-helper';
+import { TTSStyleId, STYLE_CONFIGS, formatTime, TempoId } from '../utils/tts-helper';
+import { downloadAudio } from '../utils/audio-meta';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 interface AudioPlayerProps {
@@ -21,6 +22,9 @@ interface AudioPlayerProps {
   voiceName: string;
   textSnippet: string;
   playbackSpeed: number;
+  tempo?: TempoId;
+  customDirective?: string;
+  timestamp: number;
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -31,6 +35,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   voiceName,
   textSnippet,
   playbackSpeed,
+  tempo,
+  customDirective,
+  timestamp,
   t,
   language,
 }) => {
@@ -143,14 +150,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = audioSrc;
-    const cleanDate = new Date().toISOString().slice(0, 10);
-    link.download = `gemini-arabic-${styleId}-${voiceName.toLowerCase()}-${cleanDate}.wav`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadAudio(audioBase64, { text: textSnippet, styleId, voiceName, tempo, customDirective, timestamp });
   };
+
+  const tempoName = tempo === 'lambat' ? t.tempoSlow : tempo === 'eja' ? t.tempoWordByWord : t.tempoNormal;
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(textSnippet);
@@ -197,7 +200,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           isArabicUI ? 'flex-row-reverse' : ''
         }`}
       >
-        <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex flex-wrap items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
           <span
             className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${
               styleId === 'netral'
@@ -216,6 +219,16 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           <span className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/60 font-cairo">
             {t.voiceLabel} <strong className="text-zinc-200">{voiceName}</strong>
           </span>
+
+          <span className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/60 font-cairo">
+            {t.speedLabel} <strong className="text-zinc-200">{tempoName}</strong>
+          </span>
+
+          {customDirective && (
+            <span className="text-xs text-amber-300/90 bg-amber-950/30 px-2 py-0.5 rounded border border-amber-800/40 font-cairo max-w-full truncate">
+              {t.customExpressionLabel} {customDirective}
+            </span>
+          )}
 
         </div>
 

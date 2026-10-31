@@ -8,7 +8,8 @@ import {
   Download,
   Layers,
 } from 'lucide-react';
-import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
+import { TTSStyleId, STYLE_CONFIGS, TempoId } from '../utils/tts-helper';
+import { downloadAudio } from '../utils/audio-meta';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 export interface ComparisonResult {
@@ -26,6 +27,8 @@ interface ComparisonMatrixProps {
   results: ComparisonResult[];
   text: string;
   voiceName: string;
+  tempo?: TempoId;
+  timestamp: number;
   onClose: () => void;
   t: TranslationSchema;
   language: AppLanguage;
@@ -35,6 +38,8 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({
   results,
   text,
   voiceName,
+  tempo,
+  timestamp,
   onClose,
   t,
   language,
@@ -65,12 +70,7 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({
   };
 
   const handleDownload = (styleId: TTSStyleId, base64: string) => {
-    const link = document.createElement('a');
-    link.href = `data:audio/wav;base64,${base64}`;
-    link.download = `gemini-arabic-${styleId}-${voiceName.toLowerCase()}.wav`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadAudio(base64, { text, styleId, voiceName, tempo, timestamp });
   };
 
   const isArabicUI = language === 'ar';

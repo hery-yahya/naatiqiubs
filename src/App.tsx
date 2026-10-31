@@ -72,9 +72,19 @@ export default function App() {
     styleId: TTSStyleId;
     voiceName: string;
     textSnippet: string;
+    tempo?: TempoId;
+    customDirective?: string;
+    timestamp: number;
   } | null>(null);
 
   const [comparisonResults, setComparisonResults] = useState<ComparisonResult[] | null>(null);
+  // Teks, suara, tempo, dan waktu saat perbandingan dibuat (untuk nama file unduhan)
+  const [comparisonMeta, setComparisonMeta] = useState<{
+    text: string;
+    voiceName: string;
+    tempo: TempoId;
+    timestamp: number;
+  } | null>(null);
 
   const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
   const [activeModel, setActiveModel] = useState<string>(TTS_MODEL);
@@ -170,24 +180,30 @@ export default function App() {
         throw new Error(data.error || 'Failed to synthesize Arabic audio.');
       }
 
-      const newAudioItem = {
+      const createdAt = Date.now();
+      const usedTempo = (data.tempo as TempoId) || tempo;
+      const usedCustomDirective = customDirective.trim() || undefined;
+
+      setCurrentAudio({
         audioBase64: data.audioBase64,
         styleId: data.styleId as TTSStyleId,
         voiceName: data.voiceName,
         textSnippet: data.text,
-      };
+        tempo: usedTempo,
+        customDirective: usedCustomDirective,
+        timestamp: createdAt,
+      });
 
-      setCurrentAudio(newAudioItem);
-
-      // Add to history
+      // Simpan ke riwayat
       const newHistoryEntry: HistoryItem = {
-        id: Date.now().toString(),
-        timestamp: Date.now(),
+        id: createdAt.toString(),
+        timestamp: createdAt,
         text: data.text,
         styleId: data.styleId as TTSStyleId,
         voiceName: data.voiceName,
         audioBase64: data.audioBase64,
-        tempo: data.tempo as TempoId,
+        tempo: usedTempo,
+        customDirective: usedCustomDirective,
       };
       setHistory((prev) => [newHistoryEntry, ...prev].slice(0, MAX_HISTORY_ITEMS));
       addHistoryItem(newHistoryEntry);
@@ -226,6 +242,12 @@ export default function App() {
         setShowQuotaBanner(true);
       }
 
+      setComparisonMeta({
+        text: data.text || text.trim(),
+        voiceName: data.voiceName || selectedVoice,
+        tempo: (data.tempo as TempoId) || tempo,
+        timestamp: Date.now(),
+      });
       setComparisonResults(data.results);
     } catch (err: any) {
       console.error(err);
@@ -440,6 +462,9 @@ export default function App() {
                 voiceName={currentAudio.voiceName}
                 textSnippet={currentAudio.textSnippet}
                 playbackSpeed={1}
+                tempo={currentAudio.tempo}
+                customDirective={currentAudio.customDirective}
+                timestamp={currentAudio.timestamp}
                 t={t}
                 language={language}
               />
@@ -463,8 +488,10 @@ export default function App() {
         {comparisonResults && (
           <ComparisonMatrix
             results={comparisonResults}
-            text={text}
-            voiceName={selectedVoice}
+            text={comparisonMeta?.text || text}
+            voiceName={comparisonMeta?.voiceName || selectedVoice}
+            tempo={comparisonMeta?.tempo}
+            timestamp={comparisonMeta?.timestamp || Date.now()}
             onClose={() => setComparisonResults(null)}
             t={t}
             language={language}
@@ -481,6 +508,9 @@ export default function App() {
               styleId: item.styleId,
               voiceName: item.voiceName,
               textSnippet: item.text,
+              tempo: item.tempo,
+              customDirective: item.customDirective,
+              timestamp: item.timestamp,
             });
             setSelectedStyle(item.styleId);
             setSelectedVoice(item.voiceName);

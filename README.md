@@ -77,7 +77,29 @@ Catatan kuota: tombol **"Bandingkan 3 Gaya"** memakai kuota 3 kali dalam sekali 
 
 Tempo dibuat oleh Gemini saat suara dibuat, jadi setelah mengganti tempo klik **Generate Suara** lagi.
 
-Riwayat menyimpan 30 audio terakhir di browser masing-masing perangkat.
+Riwayat menyimpan 30 audio terakhir di browser masing-masing perangkat. Di mode incognito,
+riwayat ikut terhapus saat jendela ditutup (itu sifat incognito).
+
+## Info pada riwayat dan file unduhan
+
+Setiap audio mencatat: penggalan teks, suara, gaya ekspresi, ekspresi tambahan (kalau diisi),
+tempo bicara, serta tanggal dan jam pembuatan.
+
+- **Nama file** contohnya:
+  `Naatiq_2026-11-01_0636_Kore-Wanita_Gembira_Lambat-Jeda_أهلا-وسهلا-بكم.wav`
+  (tanggal di depan supaya file tersusun urut waktu di folder).
+- **Di dalam file WAV** tersimpan label judul, suara, dan keterangan lengkap (termasuk teks utuh).
+  Label ini tampil di pemutar musik seperti VLC, dan di Properties/Info file.
+
+## Rencana pengembangan
+
+- [x] Langkah 1 — Online di Cloudflare, pesan error jelas, tanpa audio palsu
+- [x] Langkah 2 — Sandi masuk, tempo Lambat / Lambat + jeda, riwayat di IndexedDB
+- [x] Langkah 3 — Info tempo & ekspresi di riwayat dan file unduhan
+- [ ] **Dialog dua tokoh** — naskah percakapan dengan dua karakter bernama (suara L/P), dibuat sekali jadi
+- [ ] **Unduh MP3** — selain WAV, ukuran file lebih kecil untuk dibagikan lewat WhatsApp
+- [ ] **Koleksi Audio** — audio disimpan di Cloudflare sehingga bisa dibuka dari perangkat mana pun
+      (guru membuat, murid mendengarkan dari HP masing-masing)
 
 ---
 
