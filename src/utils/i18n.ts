@@ -126,6 +126,44 @@ export interface TranslationSchema {
   mp3Failed: string;
   downloadMp3Hint: string;
   downloadWavHint: string;
+  tabStudio: string;
+  tabKoleksi: string;
+  koleksiTitle: string;
+  koleksiSubtitle: string;
+  koleksiNotConfigured: string;
+  koleksiEmpty: string;
+  koleksiRefresh: string;
+  koleksiSearch: string;
+  koleksiAllFolders: string;
+  koleksiRootFolder: string;
+  koleksiPlay: string;
+  koleksiClosePlayer: string;
+  koleksiCopyLink: string;
+  koleksiCopied: string;
+  koleksiShareWa: string;
+  koleksiOpenDrive: string;
+  koleksiDelete: string;
+  koleksiDeleteConfirm: string;
+  koleksiLoading: string;
+  koleksiCount: string;
+  saveToKoleksiBtn: string;
+  saveModalTitle: string;
+  saveTitleLabel: string;
+  saveFolderLabel: string;
+  saveFolderPlaceholder: string;
+  saveSubmit: string;
+  saveSaving: string;
+  saveDone: string;
+  saveDoneHint: string;
+  teacherLoginTitle: string;
+  teacherPasswordPlaceholder: string;
+  teacherLoginBtn: string;
+  teacherLogout: string;
+  teacherBadge: string;
+  teacherWrong: string;
+  teacherNotSet: string;
+  koleksiOnlyTeacher: string;
+  shareMessage: string;
   restartAudioTooltip: string;
   playAudioAria: string;
   pauseAudioAria: string;
@@ -283,6 +321,44 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     mp3Failed: "Could not create the MP3. Please download the WAV version.",
     downloadMp3Hint: "MP3: small file, great for WhatsApp",
     downloadWavHint: "WAV: original quality",
+    tabStudio: "Studio",
+    tabKoleksi: "Collection",
+    koleksiTitle: "Audio Collection",
+    koleksiSubtitle: "Audio saved in the school Google Drive. Share the links with students via WhatsApp.",
+    koleksiNotConfigured: "The Audio Collection is not set up yet. Follow the \"Koleksi Audio\" guide in the README to connect Google Drive.",
+    koleksiEmpty: "No audio in the Collection yet. Create audio in the Studio, then click \"Save to Collection\".",
+    koleksiRefresh: "Reload",
+    koleksiSearch: "Search title…",
+    koleksiAllFolders: "All folders",
+    koleksiRootFolder: "Main folder",
+    koleksiPlay: "Play",
+    koleksiClosePlayer: "Close player",
+    koleksiCopyLink: "Copy link",
+    koleksiCopied: "Link copied!",
+    koleksiShareWa: "WhatsApp",
+    koleksiOpenDrive: "Open in Drive",
+    koleksiDelete: "Delete",
+    koleksiDeleteConfirm: "Move \"{name}\" to the Google Drive trash? It can still be restored from Drive for 30 days.",
+    koleksiLoading: "Loading the Collection…",
+    koleksiCount: "{count} audio files",
+    saveToKoleksiBtn: "Save to Collection",
+    saveModalTitle: "Save to Collection (Google Drive)",
+    saveTitleLabel: "Title",
+    saveFolderLabel: "Folder / class",
+    saveFolderPlaceholder: "e.g. Grade 7 - Introductions (empty = main folder)",
+    saveSubmit: "Save",
+    saveSaving: "Saving to Google Drive…",
+    saveDone: "Saved to the Collection!",
+    saveDoneHint: "Anyone who receives this link can open it, without the app password.",
+    teacherLoginTitle: "Sign in as teacher",
+    teacherPasswordPlaceholder: "Teacher password",
+    teacherLoginBtn: "Sign in",
+    teacherLogout: "Leave teacher mode",
+    teacherBadge: "Teacher mode",
+    teacherWrong: "Wrong teacher password.",
+    teacherNotSet: "The teacher password is not set in Cloudflare (TEACHER_PASSWORD).",
+    koleksiOnlyTeacher: "Only teachers can save and delete audio in the Collection.",
+    shareMessage: "🎧 {title}\n{url}",
     restartAudioTooltip: 'Restart from beginning',
     playAudioAria: 'Play audio',
     pauseAudioAria: 'Pause audio',
@@ -439,6 +515,44 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     mp3Failed: "تعذّر إنشاء ملف MP3. يرجى تحميل نسخة WAV.",
     downloadMp3Hint: "MP3: حجم صغير، مناسب للواتساب",
     downloadWavHint: "WAV: الجودة الأصلية",
+    tabStudio: "الاستوديو",
+    tabKoleksi: "المكتبة",
+    koleksiTitle: "مكتبة الصوتيات",
+    koleksiSubtitle: "الصوتيات محفوظة في Google Drive الخاص بالمدرسة. شارك روابطها مع الطلاب عبر واتساب.",
+    koleksiNotConfigured: "لم يتم إعداد مكتبة الصوتيات بعد. اتبع دليل \"Koleksi Audio\" في ملف README لربط Google Drive.",
+    koleksiEmpty: "لا توجد صوتيات في المكتبة بعد. أنشئ صوتًا في الاستوديو ثم اضغط \"حفظ في المكتبة\".",
+    koleksiRefresh: "تحديث",
+    koleksiSearch: "ابحث عن عنوان…",
+    koleksiAllFolders: "كل المجلدات",
+    koleksiRootFolder: "المجلد الرئيسي",
+    koleksiPlay: "تشغيل",
+    koleksiClosePlayer: "إغلاق المشغل",
+    koleksiCopyLink: "نسخ الرابط",
+    koleksiCopied: "تم نسخ الرابط!",
+    koleksiShareWa: "واتساب",
+    koleksiOpenDrive: "فتح في Drive",
+    koleksiDelete: "حذف",
+    koleksiDeleteConfirm: "نقل \"{name}\" إلى سلة مهملات Google Drive؟ يمكن استعادته من Drive خلال 30 يومًا.",
+    koleksiLoading: "جارٍ تحميل المكتبة…",
+    koleksiCount: "{count} ملف صوتي",
+    saveToKoleksiBtn: "حفظ في المكتبة",
+    saveModalTitle: "حفظ في المكتبة (Google Drive)",
+    saveTitleLabel: "العنوان",
+    saveFolderLabel: "المجلد / الفصل",
+    saveFolderPlaceholder: "مثال: الصف السابع - التعارف (اتركه فارغًا = المجلد الرئيسي)",
+    saveSubmit: "حفظ",
+    saveSaving: "جارٍ الحفظ في Google Drive…",
+    saveDone: "تم الحفظ في المكتبة!",
+    saveDoneHint: "يمكن لأي شخص يتلقى هذا الرابط فتحه دون كلمة مرور التطبيق.",
+    teacherLoginTitle: "الدخول كمعلم",
+    teacherPasswordPlaceholder: "كلمة مرور المعلم",
+    teacherLoginBtn: "دخول",
+    teacherLogout: "الخروج من وضع المعلم",
+    teacherBadge: "وضع المعلم",
+    teacherWrong: "كلمة مرور المعلم غير صحيحة.",
+    teacherNotSet: "لم يتم تعيين كلمة مرور المعلم في Cloudflare (TEACHER_PASSWORD).",
+    koleksiOnlyTeacher: "المعلمون فقط يمكنهم حفظ الصوتيات وحذفها في المكتبة.",
+    shareMessage: "🎧 {title}\n{url}",
     restartAudioTooltip: 'إعادة التشغيل من البداية',
     playAudioAria: 'تشغيل الصوت',
     pauseAudioAria: 'إيقاف مؤقت',
@@ -595,6 +709,44 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     mp3Failed: "Gagal membuat MP3. Silakan unduh versi WAV.",
     downloadMp3Hint: "MP3: ukuran kecil, cocok untuk WhatsApp",
     downloadWavHint: "WAV: kualitas asli",
+    tabStudio: "Studio",
+    tabKoleksi: "Koleksi",
+    koleksiTitle: "Koleksi Audio",
+    koleksiSubtitle: "Audio tersimpan di Google Drive sekolah. Bagikan link-nya ke murid lewat WhatsApp.",
+    koleksiNotConfigured: "Koleksi Audio belum diatur. Ikuti panduan \"Koleksi Audio\" di README untuk menghubungkan Google Drive.",
+    koleksiEmpty: "Belum ada audio di Koleksi. Buat audio di Studio, lalu klik \"Simpan ke Koleksi\".",
+    koleksiRefresh: "Muat ulang",
+    koleksiSearch: "Cari judul…",
+    koleksiAllFolders: "Semua folder",
+    koleksiRootFolder: "Folder utama",
+    koleksiPlay: "Putar",
+    koleksiClosePlayer: "Tutup pemutar",
+    koleksiCopyLink: "Salin link",
+    koleksiCopied: "Link disalin!",
+    koleksiShareWa: "WhatsApp",
+    koleksiOpenDrive: "Buka di Drive",
+    koleksiDelete: "Hapus",
+    koleksiDeleteConfirm: "Pindahkan \"{name}\" ke Sampah Google Drive? File masih bisa dipulihkan dari Drive selama 30 hari.",
+    koleksiLoading: "Memuat Koleksi…",
+    koleksiCount: "{count} audio",
+    saveToKoleksiBtn: "Simpan ke Koleksi",
+    saveModalTitle: "Simpan ke Koleksi (Google Drive)",
+    saveTitleLabel: "Judul",
+    saveFolderLabel: "Folder / kelas",
+    saveFolderPlaceholder: "mis. Kelas 7 - Perkenalan (kosongkan = folder utama)",
+    saveSubmit: "Simpan",
+    saveSaving: "Menyimpan ke Google Drive…",
+    saveDone: "Tersimpan di Koleksi!",
+    saveDoneHint: "Link ini bisa dibuka siapa saja yang menerimanya, tanpa sandi aplikasi.",
+    teacherLoginTitle: "Masuk sebagai guru",
+    teacherPasswordPlaceholder: "Sandi guru",
+    teacherLoginBtn: "Masuk",
+    teacherLogout: "Keluar mode guru",
+    teacherBadge: "Mode guru",
+    teacherWrong: "Sandi guru salah.",
+    teacherNotSet: "Sandi guru belum dipasang di Cloudflare (TEACHER_PASSWORD).",
+    koleksiOnlyTeacher: "Hanya guru yang dapat menyimpan dan menghapus audio di Koleksi.",
+    shareMessage: "🎧 {title}\n{url}",
     restartAudioTooltip: 'Ulangi dari awal',
     playAudioAria: 'Putar audio',
     pauseAudioAria: 'Jeda audio',

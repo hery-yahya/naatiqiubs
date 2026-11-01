@@ -18,14 +18,29 @@ async function sha256(text: string): Promise<Uint8Array> {
   return new Uint8Array(digest);
 }
 
-/** Bandingkan sandi tanpa membocorkan informasi lewat lama waktu proses. */
-export async function passwordMatches(env: Env, candidate: string): Promise<boolean> {
-  const expected = (env.APP_PASSWORD || '').trim();
-  if (!expected) return true;
-  const [a, b] = await Promise.all([sha256(expected), sha256(candidate.trim())]);
+/** Bandingkan dua sandi tanpa membocorkan informasi lewat lama waktu proses. */
+export async function secretMatches(expected: string, candidate: string): Promise<boolean> {
+  const [a, b] = await Promise.all([sha256(expected.trim()), sha256(candidate.trim())]);
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
   return diff === 0;
+}
+
+/** Cocokkan dengan sandi masuk aplikasi (APP_PASSWORD). */
+export async function passwordMatches(env: Env, candidate: string): Promise<boolean> {
+  const expected = (env.APP_PASSWORD || '').trim();
+  if (!expected) return true;
+  return secretMatches(expected, candidate);
+}
+
+/** Baca header sandi yang dikodekan (encodeURIComponent) dari tampilan. */
+export function readSecretHeader(request: Request, name: string): string {
+  const raw = request.headers.get(name) || '';
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -47,13 +62,7 @@ export function authRequiredResponse(): Response {
  */
 export async function checkAuth(request: Request, env: Env): Promise<Response | null> {
   if (!isPasswordRequired(env)) return null;
-  const raw = request.headers.get(PASSWORD_HEADER) || '';
-  let given = raw;
-  try {
-    given = decodeURIComponent(raw);
-  } catch {
-    // bukan teks terkode; pakai apa adanya
-  }
+  const given = readSecretHeader(request, PASSWORD_HEADER);
   if (given && (await passwordMatches(env, given))) return null;
   // Perlambat sedikit agar menebak sandi berkali-kali jadi tidak praktis.
   await delay(600);

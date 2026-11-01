@@ -1,6 +1,7 @@
 import { json, PagesContext, TTS_MODEL, AI_TEXT_MODEL } from '../gemini';
 import { STYLE_CONFIGS } from '../../src/utils/tts-helper';
 import { isPasswordRequired } from '../auth';
+import { isKoleksiConfigured, isTeacherPasswordSet } from '../koleksi';
 
 // GET /api/status — dipakai tampilan untuk menampilkan status "Terhubung".
 export const onRequestGet = async ({ env }: PagesContext): Promise<Response> => {
@@ -8,6 +9,8 @@ export const onRequestGet = async ({ env }: PagesContext): Promise<Response> => 
     status: 'ok',
     hasKey: Boolean((env.GEMINI_API_KEY || '').trim()),
     passwordRequired: isPasswordRequired(env),
+    koleksiEnabled: isKoleksiConfigured(env),
+    teacherPasswordSet: isTeacherPasswordSet(env),
     model: TTS_MODEL,
     aiModel: AI_TEXT_MODEL,
     language: 'Arabic Fusha (العربية الفصحى)',

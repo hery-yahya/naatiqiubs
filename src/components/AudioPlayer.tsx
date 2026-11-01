@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS, formatTime, TempoId } from '../utils/tts-helper';
 import { DownloadButtons } from './DownloadButtons';
+import { CloudUpload } from 'lucide-react';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 interface AudioPlayerProps {
@@ -26,6 +27,8 @@ interface AudioPlayerProps {
   timestamp: number;
   /** Diisi untuk audio dialog */
   speakers?: { name: string; voiceName: string }[];
+  /** Diisi kalau Koleksi Audio aktif: menampilkan tombol "Simpan ke Koleksi" */
+  onSaveToKoleksi?: () => void;
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -40,6 +43,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   customDirective,
   timestamp,
   speakers,
+  onSaveToKoleksi,
   t,
   language,
 }) => {
@@ -243,7 +247,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
         </div>
 
-        <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex flex-wrap items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
           <button
             type="button"
             onClick={handleCopyText}
@@ -255,6 +259,16 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </button>
 
           <DownloadButtons audioBase64={audioBase64} meta={downloadMeta} t={t} variant="full" />
+          {onSaveToKoleksi && (
+            <button
+              type="button"
+              onClick={onSaveToKoleksi}
+              className="text-xs font-medium text-emerald-100 bg-emerald-700/70 hover:bg-emerald-600 px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer font-cairo"
+            >
+              <CloudUpload className="w-3.5 h-3.5" />
+              {t.saveToKoleksiBtn}
+            </button>
+          )}
         </div>
       </div>
 

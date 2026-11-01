@@ -256,6 +256,16 @@ export function wavWithInfo(audioBase64: string, meta: AudioMeta): Uint8Array {
   }
 }
 
+/** Ubah data biner menjadi base64 (untuk dikirim ke server). */
+export function bytesToBase64(bytes: Uint8Array): string {
+  let bin = '';
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(bin);
+}
+
 function triggerDownload(bytes: Uint8Array, mimeType: string, fileName: string): void {
   const blob = new Blob([bytes as BlobPart], { type: mimeType });
   const url = URL.createObjectURL(blob);
