@@ -182,6 +182,9 @@ berisi daftar audio, tombol **Putar**, **Salin link**, **WhatsApp**, dan **Hapus
 Setelah deploy selesai, buka aplikasi → tab **Koleksi**. Masuk sebagai guru dengan sandi guru,
 lalu di Studio buat audio dan klik **Simpan ke Koleksi**.
 
+**Uji folder tanpa aplikasi:** di editor Apps Script, pilih fungsi **`cekFolder`** di toolbar atas, lalu klik **Jalankan**.
+Buka **Log eksekusi**: kalau tertulis `BERHASIL: folder ditemukan`, skrip sudah bisa melihat folder Anda.
+
 **Kalau skrip diubah nanti:** Deploy → **Kelola deployment** → ikon pensil → Versi: **Versi baru** → Deploy
 (URL tetap sama, tidak perlu mengubah Cloudflare).
 
@@ -190,7 +193,7 @@ lalu di Studio buat audio dan klik **Simpan ke Koleksi**.
 | Koleksi Audio belum diatur | Pasang `DRIVE_SCRIPT_URL` dan `DRIVE_SCRIPT_TOKEN` di Cloudflare |
 | Kunci rahasia tidak cocok | Samakan `DRIVE_SCRIPT_TOKEN` dengan `KUNCI_RAHASIA` di skrip |
 | Apps Script tidak membalas dengan benar | Pastikan URL berakhiran `/exec` dan akses "Siapa saja" |
-| FOLDER_ID belum diisi / Folder tidak ditemukan | Periksa `FOLDER_ID` di skrip, lalu buat **Versi baru** deployment |
+| FOLDER_ID belum diisi / Folder tidak ditemukan | Periksa `FOLDER_ID`; pastikan folder milik (atau dibagikan sebagai Editor ke) akun pembuat skrip; lalu buat **Versi baru** deployment. Uji dengan fungsi `cekFolder` (lihat di bawah) |
 | Sandi guru belum dipasang | Tambahkan `TEACHER_PASSWORD` di Cloudflare |
 
 ## Rencana pengembangan

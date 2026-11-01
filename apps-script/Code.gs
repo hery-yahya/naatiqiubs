@@ -19,7 +19,7 @@
  * Kalau skrip ini diubah, lakukan Deploy → Kelola deployment → Edit → Versi: "Versi baru".
  */
 
-// ID folder Google Drive tujuan. Ambil dari alamat folder:
+// ID folder Google Drive tujuan. Boleh ID-nya saja atau seluruh alamat folder, contoh:
 // https://drive.google.com/drive/folders/INI_ID_FOLDERNYA
 var FOLDER_ID = 'TEMPEL_ID_FOLDER_DI_SINI';
 
@@ -64,14 +64,48 @@ function reply_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
+/** Ambil ID folder dari FOLDER_ID (boleh berupa alamat lengkap, misalnya .../folders/ID?hl=ID). */
+function folderId_() {
+  var raw = String(FOLDER_ID || '').trim();
+  var fromUrl = raw.match(/folders\/([-\w]{10,})/);
+  if (fromUrl) return fromUrl[1];
+  var idParam = raw.match(/[?&]id=([-\w]{10,})/);
+  if (idParam) return idParam[1];
+  return raw.replace(/[?#].*$/, '').replace(/[^-\w]/g, '');
+}
+
 function getRoot_() {
   if (!FOLDER_ID || FOLDER_ID.indexOf('TEMPEL_') === 0) {
     throw new Error('FOLDER_ID belum diisi di Apps Script.');
   }
+  var id = folderId_();
   try {
-    return DriveApp.getFolderById(FOLDER_ID);
+    return DriveApp.getFolderById(id);
   } catch (err) {
-    throw new Error('Folder Drive tidak ditemukan. Periksa FOLDER_ID di Apps Script.');
+    var who = '';
+    try {
+      who = Session.getEffectiveUser().getEmail();
+    } catch (e2) {
+      // abaikan
+    }
+    throw new Error(
+      'Folder Drive tidak ditemukan (ID: ' + id + '). Pastikan folder itu milik/dibagikan ke akun ' +
+        (who || 'pembuat skrip') +
+        ' sebagai Editor, lalu buat "Versi baru" di Deploy > Kelola deployment.'
+    );
+  }
+}
+
+/**
+ * Uji cepat dari editor Apps Script: pilih fungsi "cekFolder" di toolbar, lalu klik Jalankan.
+ * Hasilnya muncul di "Log eksekusi".
+ */
+function cekFolder() {
+  var folder = getRoot_();
+  Logger.log('BERHASIL: folder ditemukan -> "' + folder.getName() + '" (' + folder.getUrl() + ')');
+  Logger.log('Akun skrip: ' + Session.getEffectiveUser().getEmail());
+  if (!KUNCI_RAHASIA || KUNCI_RAHASIA.indexOf('GANTI_') === 0) {
+    Logger.log('PERHATIAN: KUNCI_RAHASIA belum diganti.');
   }
 }
 
