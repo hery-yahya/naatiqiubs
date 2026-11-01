@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
 import type { TempoId } from '../utils/tts-helper';
+import { voiceDisplayName } from '../utils/tts-helper';
 import { formatDateTime } from '../utils/audio-meta';
 import { DownloadButtons } from './DownloadButtons';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
@@ -160,11 +161,11 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                       <span className="px-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mx-1">
                         {t.dialogLabel}
                       </span>
-                      {item.speakers.map((s) => `${s.name} (${s.voiceName})`).join(' · ')}
+                      {item.speakers.map((s) => `${s.name} (${voiceDisplayName(s.voiceName)})`).join(' · ')}
                     </span>
                   ) : (
                     <span className="text-[10px] text-zinc-400 font-mono">
-                      {t.voiceLabel} {item.voiceName}
+                      {t.voiceLabel} {voiceDisplayName(item.voiceName)}
                     </span>
                   )}
 

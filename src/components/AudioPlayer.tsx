@@ -11,7 +11,7 @@ import {
   Check,
   Share2,
 } from 'lucide-react';
-import { TTSStyleId, STYLE_CONFIGS, formatTime, TempoId } from '../utils/tts-helper';
+import { TTSStyleId, STYLE_CONFIGS, formatTime, TempoId, voiceDisplayName } from '../utils/tts-helper';
 import { DownloadButtons } from './DownloadButtons';
 import { CloudUpload } from 'lucide-react';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
@@ -225,12 +225,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
               <>
                 {t.dialogLabel}:{' '}
                 <strong className="text-zinc-200">
-                  {speakers.map((s) => `${s.name} (${s.voiceName})`).join(' · ')}
+                  {speakers.map((s) => `${s.name} (${voiceDisplayName(s.voiceName)})`).join(' · ')}
                 </strong>
               </>
             ) : (
               <>
-                {t.voiceLabel} <strong className="text-zinc-200">{voiceName}</strong>
+                {t.voiceLabel} <strong className="text-zinc-200">{voiceDisplayName(voiceName)}</strong>
               </>
             )}
           </span>

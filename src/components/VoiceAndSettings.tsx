@@ -94,7 +94,7 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
                     isArabicUI ? 'flex-row-reverse' : ''
                   }`}
                 >
-                  <span className="font-semibold text-zinc-100">{voice.name}</span>
+                  <span className="font-semibold text-zinc-100" title={`${voice.nameArabic} · Gemini: ${voice.id}`}>{voice.name}</span>
                   <span
                     className={`text-[9px] px-1 py-0.2 rounded ${
                       voice.gender.includes('أنثى')

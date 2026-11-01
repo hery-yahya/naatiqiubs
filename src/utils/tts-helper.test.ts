@@ -34,10 +34,10 @@ test('TTS_MODEL is set to gemini-3.8-flash-tts', () => {
 
 test('AVAILABLE_VOICES has Arabic voice options', () => {
   assert.ok(AVAILABLE_VOICES.length >= 3);
-  const voiceNames = AVAILABLE_VOICES.map((v) => v.name);
-  assert.ok(voiceNames.includes('Kore'));
-  assert.ok(voiceNames.includes('Fenrir'));
-  assert.ok(voiceNames.includes('Puck'));
+  const voiceIds = AVAILABLE_VOICES.map((v) => v.id);
+  assert.ok(voiceIds.includes('Kore') && voiceIds.includes('Fenrir') && voiceIds.includes('Puck'));
+  const names = AVAILABLE_VOICES.map((v) => v.name).sort();
+  assert.deepEqual(names, ['Maryam', 'Musa', 'Yasir', 'Zaid', 'Zainab']);
 });
 
 test('validateTtsInput checks empty and Arabic string bounds', () => {
@@ -112,10 +112,25 @@ test('audio file names carry voice, style, tempo, expression and time', async ()
     customDirective: 'بصوت معلم',
     timestamp: ts,
   });
-  assert.equal(name, 'Naatiq_2026-11-01_0636_Kore-Wanita_Gembira_Lambat-Jeda_ekspresi-بصوت-معلم_أهلا-وسهلا-بكم-في.wav');
+  assert.equal(name, 'Naatiq_2026-11-01-0636_Maryam-Wanita_Gembira_Lambat-Jeda_ekspresi-بصوت-معلم_أهلا-وسهلا-بكم-في.wav');
   assert.equal(
     buildFileName({ text: 'مرحبا', styleId: 'netral', voiceName: 'Fenrir', timestamp: ts }),
-    'Naatiq_2026-11-01_0636_Fenrir-Pria_Netral_Normal_مرحبا.wav'
+    'Naatiq_2026-11-01-0636_Zaid-Pria_Netral_Normal_مرحبا.wav'
   );
   assert.equal(textSnippet('أَهْلًا، وَسَهْلًا!'), 'أهلا وسهلا');
+});
+
+test('Koleksi title matches the download name, separated by spaces', async () => {
+  const { buildKoleksiTitle, buildFileName } = await import('./audio-meta');
+  const meta = {
+    text: 'مَرْحَبًا بِكُمْ فِي دَرْسِ الْيَوْمِ',
+    styleId: 'formal_berita' as const,
+    voiceName: 'Fenrir',
+    tempo: 'normal' as const,
+    timestamp: new Date(2026, 10, 1, 14, 41).getTime(),
+  };
+  assert.equal(buildKoleksiTitle(meta), 'Naatiq 2026-11-01-1441 Zaid-Pria Formal-Berita Normal مرحبا بكم في درس');
+  assert.equal(buildFileName(meta, 'mp3'), 'Naatiq_2026-11-01-1441_Zaid-Pria_Formal-Berita_Normal_مرحبا-بكم-في-درس.mp3');
+  const dialog = { ...meta, speakers: [{ name: 'أحمد', voiceName: 'Puck' }, { name: 'عمر', voiceName: 'Charon' }] };
+  assert.ok(buildKoleksiTitle(dialog).includes('Dialog-Musa-Yasir'));
 });

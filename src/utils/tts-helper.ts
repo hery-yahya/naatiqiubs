@@ -63,8 +63,11 @@ export interface TTSStyleConfig {
 }
 
 export interface VoiceOption {
+  /** Nama suara bawaan Gemini (dikirim ke Gemini, jangan diubah) */
   id: string;
+  /** Nama yang tampil di aplikasi (nama Arab agar familiar bagi murid) */
   name: string;
+  nameArabic: string;
   gender: 'أنثى (Wanita)' | 'ذكر (Pria)';
   character: string;
   characterArabic: string;
@@ -73,40 +76,50 @@ export interface VoiceOption {
 export const AVAILABLE_VOICES: VoiceOption[] = [
   {
     id: 'Kore',
-    name: 'Kore',
+    name: 'Maryam',
+    nameArabic: 'مريم',
     gender: 'أنثى (Wanita)',
     character: 'Hangat, jernih, dan artikulasi Arab fusha sangat jelas',
     characterArabic: 'صوت أنثوي دافئ، فصيح ومخارج حروف واضحة',
   },
   {
     id: 'Fenrir',
-    name: 'Fenrir',
+    name: 'Zaid',
+    nameArabic: 'زيد',
     gender: 'ذكر (Pria)',
     character: 'Wibawa, bass dalam, sangat cocok untuk berita formal',
     characterArabic: 'صوت رخيم جهوري ووقور، مثالي للنشرات الإخبارية',
   },
   {
     id: 'Puck',
-    name: 'Puck',
+    name: 'Musa',
+    nameArabic: 'موسى',
     gender: 'ذكر (Pria)',
     character: 'Ceria, bersahabat, energik dan ekspresif',
     characterArabic: 'صوت شبابي مفعم بالحيوية والبهجة والحماس',
   },
   {
     id: 'Zephyr',
-    name: 'Zephyr',
+    name: 'Zainab',
+    nameArabic: 'زينب',
     gender: 'أنثى (Wanita)',
     character: 'Cerah, modern, elegan dan artikulatif',
     characterArabic: 'صوت أنثوي مشرق وعصري وأنيق مخارج الحروف',
   },
   {
     id: 'Charon',
-    name: 'Charon',
+    name: 'Yasir',
+    nameArabic: 'ياسر',
     gender: 'ذكر (Pria)',
     character: 'Tenang, mendalam, cocok untuk narasi dan hikmah',
     characterArabic: 'صوت رصين وتأملي هادئ ومريح للمستمع',
   },
 ];
+
+/** Nama tampilan suara (mis. "Fenrir" → "Zaid"). Riwayat lama yang menyimpan nama Gemini tetap tampil dengan nama baru. */
+export function voiceDisplayName(voiceId: string): string {
+  return AVAILABLE_VOICES.find((v) => v.id === voiceId)?.name || voiceId;
+}
 
 export const STYLE_CONFIGS: Record<TTSStyleId, TTSStyleConfig> = {
   netral: {
