@@ -90,7 +90,10 @@ Pilih **Dialog** di atas editor, lalu tulis atau tempel naskah dengan format sat
 ```
 
 - **Nama tokoh** terbaca otomatis dari naskah (maksimal 2 tokoh, batas dari Gemini). Pilih suara untuk tiap tokoh.
-- **Ekspresi per baris** opsional, ditulis dalam kurung setelah nama: `(بفرح)`, `(متعجبًا)`, atau `(sedih)`.
+- **Ekspresi per baris** opsional. Cara termudah: letakkan kursor di sebuah baris (atau ketuk baris di pratinjau),
+  lalu ketuk tombol ekspresi (😊 Gembira, 😢 Sedih, 😮 Heran, ❓ Bertanya, 🤫 Berbisik, dan lain-lain).
+  Ketuk lagi untuk menghapus. Istilah Arabnya otomatis masuk ke naskah dalam kurung, misalnya `عمر (بفرح): ...`.
+  Ekspresi lain bisa diketik di kolom "Ekspresi lain", atau ditulis langsung dalam kurung.
 - Baris tanpa `Nama:` dianggap lanjutan baris sebelumnya.
 - **Gaya**, **tempo**, dan **ekspresi tambahan** berlaku untuk seluruh dialog.
 - **Harakat otomatis** dan **Asisten AI** (buat naskah / ubah ke fusha) menjaga format `Nama: teks`.

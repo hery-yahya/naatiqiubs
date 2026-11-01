@@ -46,6 +46,8 @@ export interface DialogError {
 export interface ParsedDialog {
   names: string[];
   lines: DialogLine[];
+  /** sourceLines[i] = nomor baris naskah (mulai 0) tempat giliran ke-i ditulis */
+  sourceLines: number[];
   errors: DialogError[];
   totalChars: number;
 }
@@ -66,6 +68,7 @@ export function parseDialog(script: string): ParsedDialog {
   const names: string[] = [];
   const normNames: string[] = [];
   const lines: DialogLine[] = [];
+  const sourceLines: number[] = [];
   const errors: DialogError[] = [];
 
   const rawLines = script.split(/\r?\n/);
@@ -107,6 +110,7 @@ export function parseDialog(script: string): ParsedDialog {
     }
 
     if (!text) return; // baris nama tanpa isi diabaikan
+    sourceLines.push(idx);
     lines.push({
       speaker,
       text,
@@ -121,7 +125,107 @@ export function parseDialog(script: string): ParsedDialog {
   if (lines.length > MAX_DIALOG_LINES) errors.push({ code: 'TOO_MANY_LINES', detail: String(lines.length) });
   if (totalChars > MAX_DIALOG_CHARS) errors.push({ code: 'TOO_LONG', detail: String(totalChars) });
 
-  return { names, lines, errors, totalChars };
+  return { names, lines, sourceLines, errors, totalChars };
+}
+
+/* ------------------------------------------------------------------ */
+/* Ekspresi per baris (untuk tombol ekspresi di tampilan)               */
+/* ------------------------------------------------------------------ */
+
+export interface ExpressionPreset {
+  /** Istilah Arab yang dimasukkan ke naskah */
+  ar: string;
+  id: string;
+  en: string;
+  emoji: string;
+}
+
+export const EXPRESSION_PRESETS: ExpressionPreset[] = [
+  { ar: 'بفرح', id: 'Gembira', en: 'Happy', emoji: '😊' },
+  { ar: 'بحماس', id: 'Semangat', en: 'Excited', emoji: '🔥' },
+  { ar: 'بتعجب', id: 'Heran', en: 'Surprised', emoji: '😮' },
+  { ar: 'مستفهمًا', id: 'Bertanya', en: 'Asking', emoji: '❓' },
+  { ar: 'بتردد', id: 'Ragu', en: 'Hesitant', emoji: '🤔' },
+  { ar: 'بهدوء', id: 'Tenang', en: 'Calm', emoji: '😌' },
+  { ar: 'بلطف', id: 'Lembut', en: 'Gentle', emoji: '🤗' },
+  { ar: 'بحزن', id: 'Sedih', en: 'Sad', emoji: '😢' },
+  { ar: 'بقلق', id: 'Cemas', en: 'Worried', emoji: '😟' },
+  { ar: 'بخوف', id: 'Takut', en: 'Afraid', emoji: '😨' },
+  { ar: 'بغضب', id: 'Marah', en: 'Angry', emoji: '😠' },
+  { ar: 'معتذرًا', id: 'Minta maaf', en: 'Apologetic', emoji: '🙏' },
+  { ar: 'بفخر', id: 'Bangga', en: 'Proud', emoji: '😎' },
+  { ar: 'ضاحكًا', id: 'Tertawa', en: 'Laughing', emoji: '😄' },
+  { ar: 'هامسًا', id: 'Berbisik', en: 'Whispering', emoji: '🤫' },
+  { ar: 'بصوت عالٍ', id: 'Lantang', en: 'Loud', emoji: '📢' },
+];
+
+/** Nomor baris (mulai 0) tempat posisi kursor berada. */
+export function lineIndexAt(script: string, offset: number): number {
+  let n = 0;
+  const end = Math.min(Math.max(offset, 0), script.length);
+  for (let i = 0; i < end; i++) if (script[i] === '\n') n++;
+  return n;
+}
+
+/** Posisi karakter awal sebuah baris. */
+export function lineStartOffset(script: string, lineIndex: number): number {
+  let pos = 0;
+  for (let i = 0; i < lineIndex; i++) {
+    const next = script.indexOf('\n', pos);
+    if (next === -1) return script.length;
+    pos = next + 1;
+  }
+  return pos;
+}
+
+export interface LineInfo {
+  /** baris naskah (mulai 0) yang memuat nama tokoh untuk giliran ini */
+  ownerLine: number;
+  name: string;
+  expression: string;
+  text: string;
+}
+
+/**
+ * Cari giliran bicara di posisi baris tertentu.
+ * Kalau baris itu lanjutan (tanpa "Nama:"), yang dipakai adalah baris bernama di atasnya.
+ */
+export function getLineInfo(script: string, lineIndex: number): LineInfo | null {
+  const rows = script.split(/\r?\n/);
+  for (let i = Math.min(lineIndex, rows.length - 1); i >= 0; i--) {
+    const trimmed = rows[i].trim();
+    if (!trimmed) {
+      if (i === lineIndex) continue; // kursor di baris kosong: lihat ke atas
+      continue;
+    }
+    const m = LINE_RE.exec(trimmed);
+    if (m) {
+      return { ownerLine: i, name: m[1].trim(), expression: (m[2] || '').trim(), text: (m[3] || '').trim() };
+    }
+  }
+  return null;
+}
+
+/** Bersihkan ekspresi ketikan pengguna agar tidak merusak format naskah. */
+export function sanitizeExpression(expr: string): string {
+  return expr.replace(/[()[\]:：\n\r]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_EXPRESSION_CHARS);
+}
+
+/**
+ * Pasang/ganti/hapus ekspresi pada giliran di baris tertentu.
+ * expression kosong = hapus ekspresi. Mengembalikan naskah baru dan baris yang diubah.
+ */
+export function setLineExpression(
+  script: string,
+  lineIndex: number,
+  expression: string
+): { script: string; ownerLine: number } | null {
+  const info = getLineInfo(script, lineIndex);
+  if (!info) return null;
+  const rows = script.split(/\r?\n/);
+  const expr = sanitizeExpression(expression);
+  rows[info.ownerLine] = expr ? `${info.name} (${expr}): ${info.text}` : `${info.name}: ${info.text}`;
+  return { script: rows.join('\n'), ownerLine: info.ownerLine };
 }
 
 /** Susun kembali naskah dari baris-baris (untuk disimpan di riwayat). */

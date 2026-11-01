@@ -46,3 +46,30 @@ test('built-in samples parse without errors', () => {
     assert.equal(r.names.length, 2, s.id);
   }
 });
+
+test('cursor helpers find the right turn, including continuation lines', async () => {
+  const { lineIndexAt, lineStartOffset, getLineInfo } = await import('./dialog');
+  const script = 'أحمد: السلام عليكم\nفاطمة (بفرح): وعليكم السلام\nكيف حالك؟\n\nأحمد: بخير';
+  assert.equal(lineIndexAt(script, 0), 0);
+  assert.equal(lineIndexAt(script, script.indexOf('كيف')), 2);
+  assert.equal(lineStartOffset(script, 2), script.indexOf('كيف'));
+  assert.deepEqual(getLineInfo(script, 2), { ownerLine: 1, name: 'فاطمة', expression: 'بفرح', text: 'وعليكم السلام' });
+  assert.equal(getLineInfo(script, 3)?.ownerLine, 1); // blank line belongs to the turn above
+  assert.equal(getLineInfo('tanpa nama', 0), null);
+});
+
+test('setLineExpression adds, replaces and removes expressions', async () => {
+  const { setLineExpression, parseDialog } = await import('./dialog');
+  const script = 'أحمد: السلام عليكم\nفاطمة (بفرح): وعليكم السلام\nكيف حالك؟';
+  const added = setLineExpression(script, 0, 'بتعجب')!;
+  assert.equal(added.script.split('\n')[0], 'أحمد (بتعجب): السلام عليكم');
+  const replaced = setLineExpression(script, 2, 'بحزن')!; // continuation line -> Fatimah's turn
+  assert.equal(replaced.ownerLine, 1);
+  assert.equal(replaced.script.split('\n')[1], 'فاطمة (بحزن): وعليكم السلام');
+  const removed = setLineExpression(script, 1, '')!;
+  assert.equal(removed.script.split('\n')[1], 'فاطمة: وعليكم السلام');
+  const sanitized = setLineExpression(script, 0, 'senang (sekali): ya')!;
+  assert.equal(sanitized.script.split('\n')[0], 'أحمد (senang sekali ya): السلام عليكم');
+  assert.deepEqual(parseDialog(sanitized.script).errors, []);
+  assert.deepEqual(parseDialog(script).sourceLines, [0, 1]);
+});

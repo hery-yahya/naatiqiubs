@@ -99,6 +99,13 @@ export interface TranslationSchema {
   dialogAiHint: string;
   dialogLabel: string;
   dialogFixErrors: string;
+  exprBarTitle: string;
+  exprActiveLine: string;
+  exprNoLine: string;
+  exprNone: string;
+  exprCustomPlaceholder: string;
+  exprApply: string;
+  exprPreviewHint: string;
   customNuanceToggle: string;
   customNuanceClose: string;
   customNuanceLabel: string;
@@ -244,6 +251,13 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     dialogAiHint: "Dialogue mode: the AI will write a conversation between 2 characters in the \"Name: text\" format.",
     dialogLabel: "Dialogue",
     dialogFixErrors: "Fix the dialogue script first:",
+    exprBarTitle: "Expression for the active line",
+    exprActiveLine: "Line {line} · {name}",
+    exprNoLine: "Place the cursor on a script line, or tap a line in the preview, then choose an expression.",
+    exprNone: "No expression",
+    exprCustomPlaceholder: "Other expression, e.g. بشوق",
+    exprApply: "Apply",
+    exprPreviewHint: "Tap a line to add an expression",
     customNuanceToggle: 'Custom Vocal Direction (+)',
     customNuanceClose: 'Hide Custom Direction',
     customNuanceLabel: 'Additional Vocal Nuances (Custom Style Prompt):',
@@ -388,6 +402,13 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     dialogAiHint: "وضع الحوار: سيكتب الذكاء الاصطناعي حوارًا بين شخصيتين بصيغة \"الاسم: الكلام\".",
     dialogLabel: "حوار",
     dialogFixErrors: "أصلح نص الحوار أولًا:",
+    exprBarTitle: "تعبير السطر النشط",
+    exprActiveLine: "السطر {line} · {name}",
+    exprNoLine: "ضع المؤشر على سطر من النص، أو اضغط على سطر في المعاينة، ثم اختر التعبير.",
+    exprNone: "بدون تعبير",
+    exprCustomPlaceholder: "تعبير آخر، مثل: بشوق",
+    exprApply: "تطبيق",
+    exprPreviewHint: "اضغط على سطر لإضافة تعبير",
     customNuanceToggle: 'توجيهات إضافية للنبرة (+)',
     customNuanceClose: 'إخفاء التوجيهات الخاصة',
     customNuanceLabel: 'توجيهات صوتية إضافية (Custom Style Prompt):',
@@ -532,6 +553,13 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     dialogAiHint: "Mode dialog: AI akan menulis percakapan 2 tokoh dengan format \"Nama: teks\".",
     dialogLabel: "Dialog",
     dialogFixErrors: "Perbaiki naskah dialog dulu:",
+    exprBarTitle: "Ekspresi untuk baris aktif",
+    exprActiveLine: "Baris {line} · {name}",
+    exprNoLine: "Letakkan kursor di salah satu baris naskah, atau ketuk baris di pratinjau, lalu pilih ekspresi.",
+    exprNone: "Tanpa ekspresi",
+    exprCustomPlaceholder: "Ekspresi lain, mis. بشوق",
+    exprApply: "Pasang",
+    exprPreviewHint: "Ketuk baris untuk memberi ekspresi",
     customNuanceToggle: 'Kustomisasi Nuansa Vokal (+)',
     customNuanceClose: 'Tutup Kustomisasi',
     customNuanceLabel: 'Petunjuk Nuansa Suara Tambahan (Custom Style Prompt):',
