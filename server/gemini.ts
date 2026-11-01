@@ -164,6 +164,11 @@ export async function synthesizeSpeech(
     },
   });
 
+  return extractAudio(data);
+}
+
+/** Ambil audio dari balasan Gemini (dan pastikan formatnya WAV). */
+function extractAudio(data: any): { audioBase64: string; mimeType: string } {
   checkBlocked(data);
   const part = data?.candidates?.[0]?.content?.parts?.find((p: any) => p?.inlineData?.data);
   if (!part) {
@@ -177,6 +182,48 @@ export async function synthesizeSpeech(
     return { audioBase64: pcmBase64ToWavBase64(part.inlineData.data, mimeType), mimeType: 'audio/wav' };
   }
   return { audioBase64: part.inlineData.data, mimeType: 'audio/wav' };
+}
+
+/** Satu giliran bicara dalam dialog. */
+export interface DialogTurn {
+  speakerId: string;
+  text: string;
+  style: string;
+}
+
+/**
+ * Ubah dialog dua tokoh menjadi satu audio.
+ * Setiap giliran adalah satu "part" dengan speechMetadata.speaker, dan setiap
+ * speakerId dipetakan ke satu suara bawaan Gemini (maksimal 2 pembicara).
+ */
+export async function synthesizeDialog(
+  apiKey: string,
+  turns: DialogTurn[],
+  speakers: { speakerId: string; voiceName: string }[]
+): Promise<{ audioBase64: string; mimeType: string }> {
+  const data = await callGenerateContent(apiKey, TTS_MODEL, {
+    contents: [
+      {
+        role: 'user',
+        parts: turns.map((t) => ({
+          text: t.text,
+          speechMetadata: { speaker: t.speakerId, style: t.style },
+        })),
+      },
+    ],
+    generationConfig: {
+      responseModalities: ['AUDIO'],
+      speechConfig: {
+        multiSpeakerVoiceConfig: {
+          speakerVoiceConfigs: speakers.map((s) => ({
+            speaker: s.speakerId,
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: s.voiceName } },
+          })),
+        },
+      },
+    },
+  });
+  return extractAudio(data);
 }
 
 /** Minta teks dari model Gemini biasa (untuk harakat, buat naskah, dll). */
@@ -246,17 +293,29 @@ export async function readJson(request: Request): Promise<Record<string, any>> {
 }
 
 /** Ambil dan periksa teks dari permintaan. */
-export function readText(value: unknown, emptyMessage: string): string {
+export function readText(value: unknown, emptyMessage: string, maxChars = MAX_TEXT_CHARS): string {
   const text = typeof value === 'string' ? value.trim() : '';
   if (!text) throw new GeminiError('BAD_REQUEST', emptyMessage, 400);
-  if (text.length > MAX_TEXT_CHARS) {
+  if (text.length > maxChars) {
     throw new GeminiError(
       'BAD_REQUEST',
-      `Teks terlalu panjang (${text.length} karakter). Maksimal ${MAX_TEXT_CHARS} karakter.`,
+      `Teks terlalu panjang (${text.length} karakter). Maksimal ${maxChars} karakter.`,
       400
     );
   }
   return text;
+}
+
+/** Batas teks untuk naskah dialog (isi + nama tokoh). */
+export const MAX_DIALOG_SCRIPT_CHARS = 4000;
+
+/** Aturan tambahan agar AI menjaga format naskah dialog "Nama: teks". */
+export const DIALOG_FORMAT_RULE =
+  'النص حوار بين شخصين. حافظ على بنية الأسطر كما هي تمامًا: كل سطر يبدأ باسم المتحدث ثم نقطتين (:) ثم كلامه، ' +
+  'ويمكن أن يكون بعد الاسم وصف للتعبير بين قوسين. لا تغيّر الأسماء ولا ما بين القوسين، ولا تدمج الأسطر ولا تحذفها.';
+
+export function isDialogFormat(body: Record<string, any>): boolean {
+  return body.format === 'dialog';
 }
 
 /* ------------------------------------------------------------------ */

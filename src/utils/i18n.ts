@@ -77,6 +77,28 @@ export interface TranslationSchema {
   loginErrorWrong: string;
   logoutBtn: string;
   customExpressionLabel: string;
+  modeMonolog: string;
+  modeDialog: string;
+  modeLabel: string;
+  dialogTitle: string;
+  dialogFormatHint: string;
+  dialogSamplesLabel: string;
+  dialogCharactersTitle: string;
+  dialogCharacterPlaceholder: string;
+  dialogSameVoiceWarn: string;
+  dialogPreviewTitle: string;
+  dialogLinesInfo: string;
+  dialogErrEmpty: string;
+  dialogErrNoNameFirst: string;
+  dialogErrTooMany: string;
+  dialogErrOneSpeaker: string;
+  dialogErrTooManyLines: string;
+  dialogErrTooLong: string;
+  dialogErrNameTooLong: string;
+  generateDialogBtn: string;
+  dialogAiHint: string;
+  dialogLabel: string;
+  dialogFixErrors: string;
   customNuanceToggle: string;
   customNuanceClose: string;
   customNuanceLabel: string;
@@ -200,6 +222,28 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginErrorWrong: 'Incorrect password. Please try again.',
     logoutBtn: 'Sign out',
     customExpressionLabel: 'Extra expression:',
+    modeMonolog: "Monologue",
+    modeDialog: "Dialogue",
+    modeLabel: "Mode:",
+    dialogTitle: "Dialogue Script (2 characters)",
+    dialogFormatHint: "Write one line per turn: Name: text. Add an expression in brackets if needed, e.g. Fatima (happily): ...",
+    dialogSamplesLabel: "Ready-made dialogues:",
+    dialogCharactersTitle: "Characters & voices",
+    dialogCharacterPlaceholder: "Character {n}",
+    dialogSameVoiceWarn: "Both characters use the same voice. Choose different voices so they are easy to tell apart.",
+    dialogPreviewTitle: "Preview",
+    dialogLinesInfo: "{lines} lines • {chars} / 3,000 characters",
+    dialogErrEmpty: "The dialogue script is still empty.",
+    dialogErrNoNameFirst: "Line {line}: start with the character name, e.g.  Ahmad: ...",
+    dialogErrTooMany: "Line {line}: third character \"{name}\". A dialogue can have at most 2 characters.",
+    dialogErrOneSpeaker: "The dialogue needs 2 different characters.",
+    dialogErrTooManyLines: "Too many lines ({detail}). Maximum 60 lines.",
+    dialogErrTooLong: "The dialogue is too long ({detail} characters). Maximum 3,000.",
+    dialogErrNameTooLong: "Line {line}: the character name is too long (max 30 characters).",
+    generateDialogBtn: "Generate Dialogue Audio",
+    dialogAiHint: "Dialogue mode: the AI will write a conversation between 2 characters in the \"Name: text\" format.",
+    dialogLabel: "Dialogue",
+    dialogFixErrors: "Fix the dialogue script first:",
     customNuanceToggle: 'Custom Vocal Direction (+)',
     customNuanceClose: 'Hide Custom Direction',
     customNuanceLabel: 'Additional Vocal Nuances (Custom Style Prompt):',
@@ -322,6 +366,28 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginErrorWrong: 'كلمة المرور غير صحيحة. حاول مرة أخرى.',
     logoutBtn: 'خروج',
     customExpressionLabel: 'تعبير إضافي:',
+    modeMonolog: "مونولوج",
+    modeDialog: "حوار",
+    modeLabel: "الوضع:",
+    dialogTitle: "نص الحوار (شخصيتان)",
+    dialogFormatHint: "اكتب كل جملة في سطر: الاسم: الكلام. ويمكن إضافة التعبير بين قوسين، مثل: فاطمة (بفرح): ...",
+    dialogSamplesLabel: "حوارات جاهزة:",
+    dialogCharactersTitle: "الشخصيات والأصوات",
+    dialogCharacterPlaceholder: "الشخصية {n}",
+    dialogSameVoiceWarn: "الشخصيتان بنفس الصوت. اختر صوتين مختلفين ليسهل التمييز بينهما.",
+    dialogPreviewTitle: "معاينة",
+    dialogLinesInfo: "{lines} سطر • {chars} / 3000 حرف",
+    dialogErrEmpty: "نص الحوار فارغ.",
+    dialogErrNoNameFirst: "السطر {line}: ابدأ باسم الشخصية، مثل:  أحمد: ...",
+    dialogErrTooMany: "السطر {line}: شخصية ثالثة \"{name}\". الحوار يتسع لشخصيتين فقط.",
+    dialogErrOneSpeaker: "يحتاج الحوار إلى شخصيتين مختلفتين.",
+    dialogErrTooManyLines: "عدد الأسطر كبير ({detail}). الحد الأقصى 60 سطرًا.",
+    dialogErrTooLong: "الحوار طويل جدًا ({detail} حرفًا). الحد الأقصى 3000.",
+    dialogErrNameTooLong: "السطر {line}: اسم الشخصية طويل جدًا (30 حرفًا كحد أقصى).",
+    generateDialogBtn: "توليد صوت الحوار",
+    dialogAiHint: "وضع الحوار: سيكتب الذكاء الاصطناعي حوارًا بين شخصيتين بصيغة \"الاسم: الكلام\".",
+    dialogLabel: "حوار",
+    dialogFixErrors: "أصلح نص الحوار أولًا:",
     customNuanceToggle: 'توجيهات إضافية للنبرة (+)',
     customNuanceClose: 'إخفاء التوجيهات الخاصة',
     customNuanceLabel: 'توجيهات صوتية إضافية (Custom Style Prompt):',
@@ -444,6 +510,28 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginErrorWrong: 'Sandi salah. Silakan coba lagi.',
     logoutBtn: 'Keluar',
     customExpressionLabel: 'Ekspresi tambahan:',
+    modeMonolog: "Monolog",
+    modeDialog: "Dialog",
+    modeLabel: "Mode:",
+    dialogTitle: "Naskah Dialog (2 tokoh)",
+    dialogFormatHint: "Tulis satu giliran per baris: Nama: teks. Tambahkan ekspresi dalam kurung bila perlu, contoh: فاطمة (بفرح): ...",
+    dialogSamplesLabel: "Contoh dialog siap pakai:",
+    dialogCharactersTitle: "Tokoh & suara",
+    dialogCharacterPlaceholder: "Tokoh {n}",
+    dialogSameVoiceWarn: "Kedua tokoh memakai suara yang sama. Pilih suara berbeda agar mudah dibedakan.",
+    dialogPreviewTitle: "Pratinjau",
+    dialogLinesInfo: "{lines} baris • {chars} / 3.000 karakter",
+    dialogErrEmpty: "Naskah dialog masih kosong.",
+    dialogErrNoNameFirst: "Baris {line}: awali dengan nama tokoh, contoh  أحمد: ...",
+    dialogErrTooMany: "Baris {line}: tokoh ketiga \"{name}\". Dialog maksimal 2 tokoh.",
+    dialogErrOneSpeaker: "Dialog perlu 2 tokoh yang berbeda.",
+    dialogErrTooManyLines: "Baris terlalu banyak ({detail}). Maksimal 60 baris.",
+    dialogErrTooLong: "Dialog terlalu panjang ({detail} karakter). Maksimal 3.000.",
+    dialogErrNameTooLong: "Baris {line}: nama tokoh terlalu panjang (maks. 30 karakter).",
+    generateDialogBtn: "Generate Suara Dialog",
+    dialogAiHint: "Mode dialog: AI akan menulis percakapan 2 tokoh dengan format \"Nama: teks\".",
+    dialogLabel: "Dialog",
+    dialogFixErrors: "Perbaiki naskah dialog dulu:",
     customNuanceToggle: 'Kustomisasi Nuansa Vokal (+)',
     customNuanceClose: 'Tutup Kustomisasi',
     customNuanceLabel: 'Petunjuk Nuansa Suara Tambahan (Custom Style Prompt):',
@@ -503,6 +591,11 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     quotaExceededBadge: 'Kuota habis (429)',
   },
 };
+
+/** Isi tempat kosong seperti {line} atau {name} di dalam teks terjemahan. */
+export function fill(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+}
 
 export function getTranslation(lang: AppLanguage): TranslationSchema {
   return TRANSLATIONS[lang] || TRANSLATIONS.en;

@@ -24,13 +24,16 @@ export interface HistoryItem {
   audioBase64: string;
   tempo?: TempoId;
   customDirective?: string;
+  /** 'dialog' untuk audio dua tokoh; kosong = monolog */
+  mode?: 'monolog' | 'dialog';
+  speakers?: { name: string; voiceName: string }[];
 }
 
 interface HistoryListProps {
   history: HistoryItem[];
   onClearHistory: () => void;
   onSelectHistoryItem: (item: HistoryItem) => void;
-  onLoadTextToEditor: (text: string) => void;
+  onLoadTextToEditor: (item: HistoryItem) => void;
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -73,6 +76,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
       tempo: item.tempo,
       customDirective: item.customDirective,
       timestamp: item.timestamp,
+      speakers: item.mode === 'dialog' ? item.speakers : undefined,
     });
   };
 
@@ -153,9 +157,18 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                     {styleName}
                   </span>
 
-                  <span className="text-[10px] text-zinc-400 font-mono">
-                    {t.voiceLabel} {item.voiceName}
-                  </span>
+                  {item.mode === 'dialog' && item.speakers ? (
+                    <span className="text-[10px] text-zinc-300 font-cairo">
+                      <span className="px-1 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mx-1">
+                        {t.dialogLabel}
+                      </span>
+                      {item.speakers.map((s) => `${s.name} (${s.voiceName})`).join(' · ')}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-zinc-400 font-mono">
+                      {t.voiceLabel} {item.voiceName}
+                    </span>
+                  )}
 
                   <span
                     className={`text-[10px] px-1.5 rounded border ${
@@ -204,7 +217,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => onLoadTextToEditor(item.text)}
+                  onClick={() => onLoadTextToEditor(item)}
                   className="p-1.5 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded transition-colors cursor-pointer"
                   title={t.loadToEditorTooltip}
                 >

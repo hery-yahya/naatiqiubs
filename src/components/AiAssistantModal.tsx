@@ -18,6 +18,8 @@ interface AiAssistantModalProps {
   onClose: () => void;
   activeStyle: TTSStyleId;
   onApplyScript: (script: string) => void;
+  /** 'dialog' = AI menulis/mengubah naskah percakapan 2 tokoh */
+  mode?: 'monolog' | 'dialog';
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -27,6 +29,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
   onClose,
   activeStyle,
   onApplyScript,
+  mode = 'monolog',
   t,
   language,
 }) => {
@@ -75,6 +78,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       const { res, data } = await apiPost('/api/ai/generate-script', {
           prompt: topicPrompt.trim(),
           styleId: selectedStyle,
+          format: mode === 'dialog' ? 'dialog' : undefined,
         });
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to generate Arabic script.');
@@ -98,6 +102,7 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
       const { res, data } = await apiPost('/api/ai/enhance-fusha', {
           text: inputToEnhance.trim(),
           targetStyle: selectedStyle,
+          format: mode === 'dialog' ? 'dialog' : undefined,
         });
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Failed to enhance text to Fusha.');
@@ -140,6 +145,9 @@ export const AiAssistantModal: React.FC<AiAssistantModalProps> = ({
               <p className="text-xs text-zinc-400">
                 {t.aiModalSubtitle}
               </p>
+              {mode === 'dialog' && (
+                <p className="text-[11px] text-indigo-300 mt-1 font-cairo">{t.dialogAiHint}</p>
+              )}
             </div>
           </div>
 

@@ -25,6 +25,8 @@ interface AudioPlayerProps {
   tempo?: TempoId;
   customDirective?: string;
   timestamp: number;
+  /** Diisi untuk audio dialog */
+  speakers?: { name: string; voiceName: string }[];
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -38,6 +40,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   tempo,
   customDirective,
   timestamp,
+  speakers,
   t,
   language,
 }) => {
@@ -150,7 +153,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   const handleDownload = () => {
-    downloadAudio(audioBase64, { text: textSnippet, styleId, voiceName, tempo, customDirective, timestamp });
+    downloadAudio(audioBase64, { text: textSnippet, styleId, voiceName, tempo, customDirective, timestamp, speakers });
   };
 
   const tempoName = tempo === 'lambat' ? t.tempoSlow : tempo === 'eja' ? t.tempoWordByWord : t.tempoNormal;
@@ -217,7 +220,18 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </span>
 
           <span className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/60 font-cairo">
-            {t.voiceLabel} <strong className="text-zinc-200">{voiceName}</strong>
+            {speakers && speakers.length > 0 ? (
+              <>
+                {t.dialogLabel}:{' '}
+                <strong className="text-zinc-200">
+                  {speakers.map((s) => `${s.name} (${s.voiceName})`).join(' · ')}
+                </strong>
+              </>
+            ) : (
+              <>
+                {t.voiceLabel} <strong className="text-zinc-200">{voiceName}</strong>
+              </>
+            )}
           </span>
 
           <span className="text-xs text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded border border-zinc-700/60 font-cairo">

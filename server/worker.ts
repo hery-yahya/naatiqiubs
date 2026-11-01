@@ -12,6 +12,7 @@ import { onRequestGet as status } from './routes/status';
 import { onRequestPost as login } from './routes/login';
 import { onRequestPost as ttsGenerate } from './routes/tts-generate';
 import { onRequestPost as ttsCompareAll } from './routes/tts-compare-all';
+import { onRequestPost as ttsDialog } from './routes/tts-dialog';
 import { onRequestPost as aiTashkeel } from './routes/ai-tashkeel';
 import { onRequestPost as aiGenerateScript } from './routes/ai-generate-script';
 import { onRequestPost as aiEnhanceFusha } from './routes/ai-enhance-fusha';
@@ -24,6 +25,7 @@ const ROUTES: Record<string, { method: 'GET' | 'POST'; handler: Handler; public?
   '/api/login': { method: 'POST', handler: login, public: true },
   '/api/tts/generate': { method: 'POST', handler: ttsGenerate },
   '/api/tts/compare-all': { method: 'POST', handler: ttsCompareAll },
+  '/api/tts/dialog': { method: 'POST', handler: ttsDialog },
   '/api/ai/tashkeel': { method: 'POST', handler: aiTashkeel },
   '/api/ai/generate-script': { method: 'POST', handler: aiGenerateScript },
   '/api/ai/enhance-fusha': { method: 'POST', handler: aiEnhanceFusha },

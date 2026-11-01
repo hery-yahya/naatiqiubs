@@ -17,6 +17,17 @@ export interface AudioMeta {
   tempo?: TempoId;
   customDirective?: string;
   timestamp: number;
+  /** Diisi untuk audio dialog: dua tokoh beserta suaranya. */
+  speakers?: { name: string; voiceName: string }[];
+}
+
+function isDialog(meta: AudioMeta): boolean {
+  return Array.isArray(meta.speakers) && meta.speakers.length > 0;
+}
+
+/** Ringkasan tokoh dialog, misalnya "أحمد (Puck, Pria) & فاطمة (Kore, Wanita)". */
+export function speakersLabel(meta: AudioMeta): string {
+  return (meta.speakers || []).map((s) => `${s.name} (${voiceLabel(s.voiceName).replace(' (', ', ').replace(/\)$/, '')})`).join(' & ');
 }
 
 /** Nama gaya dan tempo dalam Bahasa Indonesia (tetap sama apa pun bahasa tampilan). */
@@ -77,10 +88,15 @@ function slug(text: string, maxLen: number): string {
  */
 export function buildFileName(meta: AudioMeta, ext = 'wav'): string {
   const v = AVAILABLE_VOICES.find((x) => x.id === meta.voiceName);
+  const voicePart = isDialog(meta)
+    ? `Dialog-${(meta.speakers || []).map((s) => s.voiceName).join('-')}`
+    : v
+    ? `${v.name}-${v.gender.includes('أنثى') ? 'Wanita' : 'Pria'}`
+    : slug(meta.voiceName, 20);
   const parts = [
     'Naatiq',
     stamp(meta.timestamp),
-    v ? `${v.name}-${v.gender.includes('أنثى') ? 'Wanita' : 'Pria'}` : slug(meta.voiceName, 20),
+    voicePart,
     slug(STYLE_NAMES_ID[meta.styleId] || meta.styleId, 20),
     slug(TEMPO_NAMES_ID[meta.tempo || 'normal'], 20),
   ];
@@ -107,11 +123,12 @@ export function formatDateTime(ts: number, locale = 'id-ID'): string {
 
 /** Keterangan lengkap (dipakai sebagai komentar di dalam file WAV). */
 export function buildDescription(meta: AudioMeta): string {
-  const lines = [
-    `Teks: ${meta.text}`,
-    `Suara: ${voiceLabel(meta.voiceName)}`,
-    `Gaya ekspresi: ${STYLE_NAMES_ID[meta.styleId] || meta.styleId} (${STYLE_CONFIGS[meta.styleId]?.nameArabic || ''})`,
-  ];
+  const lines = isDialog(meta)
+    ? [`Mode: Dialog`, `Tokoh: ${speakersLabel(meta)}`, `Naskah:\n${meta.text}`]
+    : [`Teks: ${meta.text}`, `Suara: ${voiceLabel(meta.voiceName)}`];
+  lines.push(
+    `Gaya ekspresi: ${STYLE_NAMES_ID[meta.styleId] || meta.styleId} (${STYLE_CONFIGS[meta.styleId]?.nameArabic || ''})`
+  );
   const custom = (meta.customDirective || '').trim();
   if (custom) lines.push(`Ekspresi tambahan: ${custom}`);
   lines.push(`Tempo bicara: ${TEMPO_NAMES_ID[meta.tempo || 'normal']}`);
@@ -151,8 +168,11 @@ function infoSubChunk(id: string, value: string): Uint8Array {
 
 function buildInfoChunk(meta: AudioMeta): Uint8Array {
   const subs = [
-    infoSubChunk('INAM', `${textSnippet(meta.text, 6)} — ${STYLE_NAMES_ID[meta.styleId]}, ${TEMPO_NAMES_ID[meta.tempo || 'normal']}`),
-    infoSubChunk('IART', `Nāṭiq — ${voiceLabel(meta.voiceName)}`),
+    infoSubChunk(
+      'INAM',
+      `${isDialog(meta) ? 'Dialog: ' : ''}${textSnippet(meta.text, 6)} — ${STYLE_NAMES_ID[meta.styleId]}, ${TEMPO_NAMES_ID[meta.tempo || 'normal']}`
+    ),
+    infoSubChunk('IART', `Nāṭiq — ${isDialog(meta) ? speakersLabel(meta) : voiceLabel(meta.voiceName)}`),
     infoSubChunk('ICMT', buildDescription(meta)),
     infoSubChunk('ICRD', stamp(meta.timestamp).slice(0, 10)),
     infoSubChunk('ISFT', 'Nāṭiq IUBS — Gemini 3.8 Flash TTS'),

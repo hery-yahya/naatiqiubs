@@ -80,6 +80,23 @@ Tempo dibuat oleh Gemini saat suara dibuat, jadi setelah mengganti tempo klik **
 Riwayat menyimpan 30 audio terakhir di browser masing-masing perangkat. Di mode incognito,
 riwayat ikut terhapus saat jendela ditutup (itu sifat incognito).
 
+## Mode Dialog (2 tokoh)
+
+Pilih **Dialog** di atas editor, lalu tulis atau tempel naskah dengan format satu giliran per baris:
+
+```
+أحمد: السَّلَامُ عَلَيْكُمْ يَا عُمَرُ، كَيْفَ حَالُكَ؟
+عمر (بفرح): وَعَلَيْكُمُ السَّلَامُ، أَنَا بِخَيْرٍ وَالْحَمْدُ لِلَّهِ.
+```
+
+- **Nama tokoh** terbaca otomatis dari naskah (maksimal 2 tokoh, batas dari Gemini). Pilih suara untuk tiap tokoh.
+- **Ekspresi per baris** opsional, ditulis dalam kurung setelah nama: `(بفرح)`, `(متعجبًا)`, atau `(sedih)`.
+- Baris tanpa `Nama:` dianggap lanjutan baris sebelumnya.
+- **Gaya**, **tempo**, dan **ekspresi tambahan** berlaku untuk seluruh dialog.
+- **Harakat otomatis** dan **Asisten AI** (buat naskah / ubah ke fusha) menjaga format `Nama: teks`.
+- Batas: 60 baris dan 3.000 karakter per dialog.
+- Tombol **Bandingkan 3 Gaya** hanya ada di mode Monolog.
+
 ## Info pada riwayat dan file unduhan
 
 Setiap audio mencatat: penggalan teks, suara, gaya ekspresi, ekspresi tambahan (kalau diisi),
@@ -87,6 +104,7 @@ tempo bicara, serta tanggal dan jam pembuatan.
 
 - **Nama file** contohnya:
   `Naatiq_2026-11-01_0636_Kore-Wanita_Gembira_Lambat-Jeda_أهلا-وسهلا-بكم.wav`
+  atau untuk dialog: `Naatiq_2026-11-01_0940_Dialog-Puck-Charon_Netral_Normal_أحمد-السلام-عليكم.wav`
   (tanggal di depan supaya file tersusun urut waktu di folder).
 - **Di dalam file WAV** tersimpan label judul, suara, dan keterangan lengkap (termasuk teks utuh).
   Label ini tampil di pemutar musik seperti VLC, dan di Properties/Info file.
@@ -96,7 +114,7 @@ tempo bicara, serta tanggal dan jam pembuatan.
 - [x] Langkah 1 — Online di Cloudflare, pesan error jelas, tanpa audio palsu
 - [x] Langkah 2 — Sandi masuk, tempo Lambat / Lambat + jeda, riwayat di IndexedDB
 - [x] Langkah 3 — Info tempo & ekspresi di riwayat dan file unduhan
-- [ ] **Dialog dua tokoh** — naskah percakapan dengan dua karakter bernama (suara L/P), dibuat sekali jadi
+- [x] Langkah 4 — **Dialog dua tokoh** (tetap ada mode Monolog), ekspresi per baris
 - [ ] **Unduh MP3** — selain WAV, ukuran file lebih kecil untuk dibagikan lewat WhatsApp
 - [ ] **Koleksi Audio** — audio disimpan di Cloudflare sehingga bisa dibuka dari perangkat mana pun
       (guru membuat, murid mendengarkan dari HP masing-masing)
@@ -115,6 +133,7 @@ server/routes/        ← fungsi server (memanggil Gemini)
   login.ts              periksa sandi dari layar masuk
   tts-generate.ts       teks → suara (1 gaya)
   tts-compare-all.ts    teks → suara (3 gaya sekaligus)
+  tts-dialog.ts         dialog 2 tokoh → satu audio
   ai-tashkeel.ts        beri harakat otomatis
   ai-generate-script.ts buat naskah dari topik
   ai-enhance-fusha.ts   ubah teks Indonesia/Inggris/'amiyah ke fusha
