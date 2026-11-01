@@ -3,7 +3,6 @@ import {
   Play,
   Pause,
   RotateCcw,
-  Download,
   Volume2,
   VolumeX,
   Sparkles,
@@ -13,7 +12,7 @@ import {
   Share2,
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS, formatTime, TempoId } from '../utils/tts-helper';
-import { downloadAudio } from '../utils/audio-meta';
+import { DownloadButtons } from './DownloadButtons';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 interface AudioPlayerProps {
@@ -152,9 +151,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const handleDownload = () => {
-    downloadAudio(audioBase64, { text: textSnippet, styleId, voiceName, tempo, customDirective, timestamp, speakers });
-  };
+  const downloadMeta = { text: textSnippet, styleId, voiceName, tempo, customDirective, timestamp, speakers };
 
   const tempoName = tempo === 'lambat' ? t.tempoSlow : tempo === 'eja' ? t.tempoWordByWord : t.tempoNormal;
 
@@ -257,14 +254,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
             {copied ? t.copiedBtn : t.copyTextBtn}
           </button>
 
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded-lg shadow-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <Download className="w-3.5 h-3.5" />
-            {t.downloadWavBtn}
-          </button>
+          <DownloadButtons audioBase64={audioBase64} meta={downloadMeta} t={t} variant="full" />
         </div>
       </div>
 

@@ -9,6 +9,7 @@
  */
 
 import { STYLE_CONFIGS, TTSStyleId, TempoId, AVAILABLE_VOICES } from './tts-helper';
+import { wavToMp3, withId3 } from './mp3';
 
 export interface AudioMeta {
   text: string;
@@ -56,7 +57,9 @@ export function stripHarakat(text: string): string {
 
 /** Penggalan beberapa kata pertama dari teks. */
 export function textSnippet(text: string, maxWords = 4): string {
-  const words = stripHarakat(text).replace(/[«»"“”'‘’.,،؛;:!?؟()[\]{}]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const words = stripHarakat(text)
+    .replace(/[(\[][^)\]]*[)\]]/g, ' ') // buang ekspresi dalam kurung
+    .replace(/[«»"“”'‘’.,،؛;:!?؟()[\]{}]/g, ' ').trim().split(/\s+/).filter(Boolean);
   const snippet = words.slice(0, maxWords).join(' ');
   return words.length > maxWords ? `${snippet}…` : snippet;
 }
@@ -166,13 +169,23 @@ function infoSubChunk(id: string, value: string): Uint8Array {
   return out;
 }
 
+/** Judul singkat audio (dipakai sebagai label judul di WAV/MP3). */
+export function metaTitle(meta: AudioMeta): string {
+  return `${isDialog(meta) ? 'Dialog: ' : ''}${textSnippet(meta.text, 6)} — ${STYLE_NAMES_ID[meta.styleId]}, ${TEMPO_NAMES_ID[meta.tempo || 'normal']}`;
+}
+
+/** Label "artis": aplikasi + suara/tokoh. */
+export function metaArtist(meta: AudioMeta): string {
+  return `Nāṭiq — ${isDialog(meta) ? speakersLabel(meta) : voiceLabel(meta.voiceName)}`;
+}
+
 function buildInfoChunk(meta: AudioMeta): Uint8Array {
   const subs = [
     infoSubChunk(
       'INAM',
-      `${isDialog(meta) ? 'Dialog: ' : ''}${textSnippet(meta.text, 6)} — ${STYLE_NAMES_ID[meta.styleId]}, ${TEMPO_NAMES_ID[meta.tempo || 'normal']}`
+      metaTitle(meta)
     ),
-    infoSubChunk('IART', `Nāṭiq — ${isDialog(meta) ? speakersLabel(meta) : voiceLabel(meta.voiceName)}`),
+    infoSubChunk('IART', metaArtist(meta)),
     infoSubChunk('ICMT', buildDescription(meta)),
     infoSubChunk('ICRD', stamp(meta.timestamp).slice(0, 10)),
     infoSubChunk('ISFT', 'Nāṭiq IUBS — Gemini 3.8 Flash TTS'),
@@ -243,16 +256,37 @@ export function wavWithInfo(audioBase64: string, meta: AudioMeta): Uint8Array {
   }
 }
 
-/** Unduh audio dengan nama file dan label lengkap. */
-export function downloadAudio(audioBase64: string, meta: AudioMeta): void {
-  const bytes = wavWithInfo(audioBase64, meta);
-  const blob = new Blob([bytes as BlobPart], { type: 'audio/wav' });
+function triggerDownload(bytes: Uint8Array, mimeType: string, fileName: string): void {
+  const blob = new Blob([bytes as BlobPart], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = buildFileName(meta);
+  link.download = fileName;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+/** Unduh audio WAV dengan nama file dan label lengkap. */
+export function downloadAudio(audioBase64: string, meta: AudioMeta): void {
+  triggerDownload(wavWithInfo(audioBase64, meta), 'audio/wav', buildFileName(meta, 'wav'));
+}
+
+/** Buat MP3 (dengan label judul, suara, dan keterangan lengkap) dari audio WAV. */
+export async function makeMp3(audioBase64: string, meta: AudioMeta): Promise<Uint8Array> {
+  const mp3 = await wavToMp3(base64ToBytes(audioBase64));
+  return withId3(mp3, {
+    title: metaTitle(meta),
+    artist: metaArtist(meta),
+    album: 'Nāṭiq IUBS',
+    year: stamp(meta.timestamp).slice(0, 4),
+    genre: 'Bahasa Arab Fusha',
+    comment: buildDescription(meta),
+  });
+}
+
+/** Unduh audio sebagai MP3 (ukuran ± 6x lebih kecil, praktis untuk WhatsApp). */
+export async function downloadAudioMp3(audioBase64: string, meta: AudioMeta): Promise<void> {
+  triggerDownload(await makeMp3(audioBase64, meta), 'audio/mpeg', buildFileName(meta, 'mp3'));
 }

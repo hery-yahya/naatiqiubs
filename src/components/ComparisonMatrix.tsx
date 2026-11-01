@@ -5,11 +5,10 @@ import {
   Newspaper,
   Play,
   Pause,
-  Download,
   Layers,
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS, TempoId } from '../utils/tts-helper';
-import { downloadAudio } from '../utils/audio-meta';
+import { DownloadButtons } from './DownloadButtons';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 export interface ComparisonResult {
@@ -69,9 +68,6 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({
     }
   };
 
-  const handleDownload = (styleId: TTSStyleId, base64: string) => {
-    downloadAudio(base64, { text, styleId, voiceName, tempo, timestamp });
-  };
 
   const isArabicUI = language === 'ar';
 
@@ -236,14 +232,11 @@ export const ComparisonMatrix: React.FC<ComparisonMatrixProps> = ({
                       )}
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDownload(res.styleId, res.audioBase64!)}
-                      className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors cursor-pointer"
-                      title={t.downloadWavBtn}
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                    </button>
+                    <DownloadButtons
+                      audioBase64={res.audioBase64!}
+                      meta={{ text, styleId: res.styleId, voiceName, tempo, timestamp }}
+                      t={t}
+                    />
                   </>
                 ) : (
                   <div className="max-w-full overflow-hidden text-[11px] text-rose-400 font-medium break-words leading-tight p-1 bg-rose-950/20 rounded border border-rose-900/30">
