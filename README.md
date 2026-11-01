@@ -100,6 +100,16 @@ Pilih **Dialog** di atas editor, lalu tulis atau tempel naskah dengan format sat
 - Batas: 60 baris dan 3.000 karakter per dialog.
 - Tombol **Bandingkan 3 Gaya** hanya ada di mode Monolog.
 
+### Cara aplikasi memberi arahan ke Gemini
+
+Sesuai saran dokumentasi Gemini TTS, arahan gaya dibuat **singkat dan berbahasa Inggris**
+(naskahnya tetap bahasa Arab), misalnya `cheerful and enthusiastic, smiling; speaking slowly and clearly`.
+Pada baris dialog yang diberi ekspresi, **ekspresi baris menggantikan gaya umum** agar tidak bertabrakan.
+Ekspresi 🤫 Berbisik dan 😄 Tertawa juga diberi tanda khusus Gemini (`<whispering>`, `<laugh>`).
+
+Gemini tetap model AI, jadi hasilnya bisa sedikit berbeda setiap kali dibuat. Kalau satu baris kurang pas,
+cukup **Generate ulang**.
+
 ## Info pada riwayat dan file unduhan
 
 Setiap audio mencatat: penggalan teks, suara, gaya ekspresi, ekspresi tambahan (kalau diisi),

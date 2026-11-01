@@ -176,11 +176,11 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
           </div>
 
           <div
-            dir="rtl"
-            className="text-[11px] text-zinc-400 p-2 rounded bg-zinc-900 border border-zinc-800 font-arabic text-right leading-relaxed"
+            dir="ltr"
+            className="text-[11px] text-zinc-400 p-2 rounded bg-zinc-900 border border-zinc-800 text-left leading-relaxed"
           >
-            <span className="text-zinc-500 not-italic">{t.baseDirectivePrefix} </span>
-            <span className="text-zinc-300">{activeStyleConfig.directive}</span>
+            <span className="text-zinc-500 not-italic font-cairo">{t.baseDirectivePrefix} </span>
+            <span className="text-zinc-300 font-mono">{activeStyleConfig.ttsStyle}</span>
           </div>
 
           <input

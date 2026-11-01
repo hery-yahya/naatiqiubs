@@ -19,6 +19,7 @@ import {
   TTSStyleId,
 } from '../../src/utils/tts-helper';
 import {
+  expressionToStyle,
   formatDialog,
   MAX_DIALOG_CHARS,
   MAX_DIALOG_LINES,
@@ -73,13 +74,16 @@ export const onRequestPost = async ({ request, env }: PagesContext): Promise<Res
     const tempo: TempoId = isTempoId(body.tempo) ? body.tempo : 'normal';
     const customDirective =
       typeof body.customDirective === 'string' ? body.customDirective.slice(0, 500) : undefined;
-    const baseStyle = buildSpeechDirective(styleId, customDirective, tempo);
-
-    const turns: DialogTurn[] = lines.map((l: { speaker: number; text: string; expression?: string }) => ({
-      speakerId: SPEAKER_IDS[l.speaker],
-      text: applyTempoToText(l.text, tempo),
-      style: l.expression ? `${baseStyle} التعبير في هذا السطر: ${l.expression}.` : baseStyle,
-    }));
+    // Setiap giliran: ekspresi baris (kalau ada) MENGGANTIKAN gaya umum agar tidak bertabrakan.
+    const turns: DialogTurn[] = lines.map((l: { speaker: number; text: string; expression?: string }) => {
+      const expr = l.expression ? expressionToStyle(l.expression) : null;
+      const spoken = applyTempoToText(l.text, tempo);
+      return {
+        speakerId: SPEAKER_IDS[l.speaker],
+        text: expr?.tag ? `${expr.tag} ${spoken}` : spoken,
+        style: buildSpeechDirective(styleId, customDirective, tempo, expr?.style),
+      };
+    });
 
     const apiKey = requireApiKey(env);
     const { audioBase64, mimeType } = await synthesizeDialog(
