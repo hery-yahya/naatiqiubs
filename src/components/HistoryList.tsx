@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
 import type { TempoId } from '../utils/tts-helper';
+import { downloadAudio, formatDateTime } from '../utils/audio-meta';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 export interface HistoryItem {
@@ -22,6 +23,7 @@ export interface HistoryItem {
   voiceName: string;
   audioBase64: string;
   tempo?: TempoId;
+  customDirective?: string;
 }
 
 interface HistoryListProps {
@@ -64,13 +66,18 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   };
 
   const handleDownload = (item: HistoryItem) => {
-    const link = document.createElement('a');
-    link.href = `data:audio/wav;base64,${item.audioBase64}`;
-    link.download = `gemini-arabic-${item.styleId}-${item.voiceName.toLowerCase()}-${item.id.slice(0, 6)}.wav`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadAudio(item.audioBase64, {
+      text: item.text,
+      styleId: item.styleId,
+      voiceName: item.voiceName,
+      tempo: item.tempo,
+      customDirective: item.customDirective,
+      timestamp: item.timestamp,
+    });
   };
+
+  const tempoName = (tempo?: TempoId) =>
+    tempo === 'lambat' ? t.tempoSlow : tempo === 'eja' ? t.tempoWordByWord : t.tempoNormal;
 
   if (history.length === 0) {
     return null;
@@ -106,10 +113,10 @@ export const HistoryList: React.FC<HistoryListProps> = ({
         {history.map((item) => {
           const cfg = STYLE_CONFIGS[item.styleId] || STYLE_CONFIGS.netral;
           const isPlaying = playingId === item.id;
-          const timeFormatted = new Date(item.timestamp).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-          });
+          const timeFormatted = formatDateTime(
+            item.timestamp,
+            language === 'ar' ? 'ar' : language === 'en' ? 'en-US' : 'id-ID'
+          );
 
           const styleName =
             item.styleId === 'netral'
@@ -150,10 +157,26 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                     {t.voiceLabel} {item.voiceName}
                   </span>
 
+                  <span
+                    className={`text-[10px] px-1.5 rounded border ${
+                      item.tempo && item.tempo !== 'normal'
+                        ? 'bg-sky-500/10 text-sky-300 border-sky-500/20'
+                        : 'text-zinc-400 border-zinc-700'
+                    }`}
+                  >
+                    {tempoName(item.tempo)}
+                  </span>
+
                   <span className="text-[10px] text-zinc-500 mx-2">
                     {timeFormatted}
                   </span>
                 </div>
+
+                {item.customDirective && (
+                  <p className="text-[10px] text-amber-300/80 truncate mb-0.5 font-cairo">
+                    {t.customExpressionLabel} {item.customDirective}
+                  </p>
+                )}
 
                 <p dir="rtl" className="text-zinc-300 truncate text-xs font-arabic text-right">
                   {item.text}

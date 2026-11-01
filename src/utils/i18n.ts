@@ -76,6 +76,7 @@ export interface TranslationSchema {
   loginChecking: string;
   loginErrorWrong: string;
   logoutBtn: string;
+  customExpressionLabel: string;
   customNuanceToggle: string;
   customNuanceClose: string;
   customNuanceLabel: string;
@@ -198,6 +199,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginChecking: 'Checking…',
     loginErrorWrong: 'Incorrect password. Please try again.',
     logoutBtn: 'Sign out',
+    customExpressionLabel: 'Extra expression:',
     customNuanceToggle: 'Custom Vocal Direction (+)',
     customNuanceClose: 'Hide Custom Direction',
     customNuanceLabel: 'Additional Vocal Nuances (Custom Style Prompt):',
@@ -319,6 +321,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginChecking: 'جارٍ التحقق…',
     loginErrorWrong: 'كلمة المرور غير صحيحة. حاول مرة أخرى.',
     logoutBtn: 'خروج',
+    customExpressionLabel: 'تعبير إضافي:',
     customNuanceToggle: 'توجيهات إضافية للنبرة (+)',
     customNuanceClose: 'إخفاء التوجيهات الخاصة',
     customNuanceLabel: 'توجيهات صوتية إضافية (Custom Style Prompt):',
@@ -440,6 +443,7 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     loginChecking: 'Memeriksa…',
     loginErrorWrong: 'Sandi salah. Silakan coba lagi.',
     logoutBtn: 'Keluar',
+    customExpressionLabel: 'Ekspresi tambahan:',
     customNuanceToggle: 'Kustomisasi Nuansa Vokal (+)',
     customNuanceClose: 'Tutup Kustomisasi',
     customNuanceLabel: 'Petunjuk Nuansa Suara Tambahan (Custom Style Prompt):',

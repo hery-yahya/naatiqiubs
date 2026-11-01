@@ -96,3 +96,22 @@ test('buildSpeechDirective adds tempo instructions', () => {
   assert.ok(buildSpeechDirective('gembira', 'بصوت هادئ', 'eja').includes('word by word'));
   assert.ok(isTempoId('eja') && !isTempoId('cepat'));
 });
+
+test('audio file names carry voice, style, tempo, expression and time', async () => {
+  const { buildFileName, textSnippet } = await import('./audio-meta');
+  const ts = new Date(2026, 10, 1, 6, 36).getTime();
+  const name = buildFileName({
+    text: 'أَهْلًا وَسَهْلًا بِكُمْ فِي تَطْبِيقِ نَاطِقٍ',
+    styleId: 'gembira',
+    voiceName: 'Kore',
+    tempo: 'eja',
+    customDirective: 'بصوت معلم',
+    timestamp: ts,
+  });
+  assert.equal(name, 'Naatiq_2026-11-01_0636_Kore-Wanita_Gembira_Lambat-Jeda_ekspresi-بصوت-معلم_أهلا-وسهلا-بكم-في.wav');
+  assert.equal(
+    buildFileName({ text: 'مرحبا', styleId: 'netral', voiceName: 'Fenrir', timestamp: ts }),
+    'Naatiq_2026-11-01_0636_Fenrir-Pria_Netral_Normal_مرحبا.wav'
+  );
+  assert.equal(textSnippet('أَهْلًا، وَسَهْلًا!'), 'أهلا وسهلا');
+});
