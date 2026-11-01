@@ -122,13 +122,29 @@ tempo bicara, serta tanggal dan jam pembuatan.
 - **Di dalam file WAV** tersimpan label judul, suara, dan keterangan lengkap (termasuk teks utuh).
   Label ini tampil di pemutar musik seperti VLC, dan di Properties/Info file.
 
+## Unduh MP3 atau WAV
+
+Setiap audio (di pemutar, riwayat, dan perbandingan) punya dua tombol unduh:
+
+| Format | Ukuran | Cocok untuk |
+|---|---|---|
+| **MP3** (64 kbps) | ± 6x lebih kecil (1 menit ≈ 0,5 MB) | Dibagikan lewat WhatsApp, diputar di HP |
+| **WAV** | Besar (1 menit ≈ 2,9 MB) | Kualitas asli, untuk disunting |
+
+MP3 dibuat langsung di browser, jadi **tidak memakai kuota Gemini** dan tidak membebani server.
+Label judul, tokoh/suara, dan keterangan lengkap ikut tersimpan di dalam file MP3 (ID3).
+
+Encoder MP3 memakai [lamejs](https://github.com/zhuker/lamejs), port JavaScript dari
+[LAME](https://lame.sourceforge.io) (lisensi LGPL). File aslinya disimpan tanpa diubah di `public/vendor/`.
+
 ## Rencana pengembangan
 
 - [x] Langkah 1 — Online di Cloudflare, pesan error jelas, tanpa audio palsu
 - [x] Langkah 2 — Sandi masuk, tempo Lambat / Lambat + jeda, riwayat di IndexedDB
 - [x] Langkah 3 — Info tempo & ekspresi di riwayat dan file unduhan
 - [x] Langkah 4 — **Dialog dua tokoh** (tetap ada mode Monolog), ekspresi per baris
-- [ ] **Unduh MP3** — selain WAV, ukuran file lebih kecil untuk dibagikan lewat WhatsApp
+- [x] Langkah 5 — Ekspresi lebih konsisten (arahan Gemini singkat)
+- [x] Langkah 6 — **Unduh MP3** (selain WAV), dibuat di browser
 - [ ] **Koleksi Audio** — audio disimpan di Cloudflare sehingga bisa dibuka dari perangkat mana pun
       (guru membuat, murid mendengarkan dari HP masing-masing)
 

@@ -121,6 +121,11 @@ export interface TranslationSchema {
   copyTextBtn: string;
   copiedBtn: string;
   downloadWavBtn: string;
+  downloadMp3Btn: string;
+  mp3Working: string;
+  mp3Failed: string;
+  downloadMp3Hint: string;
+  downloadWavHint: string;
   restartAudioTooltip: string;
   playAudioAria: string;
   pauseAudioAria: string;
@@ -273,6 +278,11 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     copyTextBtn: 'Copy Script',
     copiedBtn: 'Copied!',
     downloadWavBtn: 'Download (.wav)',
+    downloadMp3Btn: "Download MP3",
+    mp3Working: "Creating MP3…",
+    mp3Failed: "Could not create the MP3. Please download the WAV version.",
+    downloadMp3Hint: "MP3: small file, great for WhatsApp",
+    downloadWavHint: "WAV: original quality",
     restartAudioTooltip: 'Restart from beginning',
     playAudioAria: 'Play audio',
     pauseAudioAria: 'Pause audio',
@@ -424,6 +434,11 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     copyTextBtn: 'نسخ النص',
     copiedBtn: 'تم النسخ!',
     downloadWavBtn: 'تحميل الصوت (.wav)',
+    downloadMp3Btn: "تحميل MP3",
+    mp3Working: "جارٍ إنشاء MP3…",
+    mp3Failed: "تعذّر إنشاء ملف MP3. يرجى تحميل نسخة WAV.",
+    downloadMp3Hint: "MP3: حجم صغير، مناسب للواتساب",
+    downloadWavHint: "WAV: الجودة الأصلية",
     restartAudioTooltip: 'إعادة التشغيل من البداية',
     playAudioAria: 'تشغيل الصوت',
     pauseAudioAria: 'إيقاف مؤقت',
@@ -575,6 +590,11 @@ export const TRANSLATIONS: Record<AppLanguage, TranslationSchema> = {
     copyTextBtn: 'Salin Naskah',
     copiedBtn: 'Tersalin!',
     downloadWavBtn: 'Unduh Audio (.wav)',
+    downloadMp3Btn: "Unduh MP3",
+    mp3Working: "Membuat MP3…",
+    mp3Failed: "Gagal membuat MP3. Silakan unduh versi WAV.",
+    downloadMp3Hint: "MP3: ukuran kecil, cocok untuk WhatsApp",
+    downloadWavHint: "WAV: kualitas asli",
     restartAudioTooltip: 'Ulangi dari awal',
     playAudioAria: 'Putar audio',
     pauseAudioAria: 'Jeda audio',

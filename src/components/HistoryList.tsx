@@ -4,7 +4,6 @@ import {
   Trash2,
   Play,
   Pause,
-  Download,
   RotateCcw,
   Sparkles,
   Smile,
@@ -12,7 +11,8 @@ import {
 } from 'lucide-react';
 import { TTSStyleId, STYLE_CONFIGS } from '../utils/tts-helper';
 import type { TempoId } from '../utils/tts-helper';
-import { downloadAudio, formatDateTime } from '../utils/audio-meta';
+import { formatDateTime } from '../utils/audio-meta';
+import { DownloadButtons } from './DownloadButtons';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 
 export interface HistoryItem {
@@ -68,8 +68,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
     }
   };
 
-  const handleDownload = (item: HistoryItem) => {
-    downloadAudio(item.audioBase64, {
+  const metaOf = (item: HistoryItem) => ({
       text: item.text,
       styleId: item.styleId,
       voiceName: item.voiceName,
@@ -77,8 +76,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
       customDirective: item.customDirective,
       timestamp: item.timestamp,
       speakers: item.mode === 'dialog' ? item.speakers : undefined,
-    });
-  };
+  });
 
   const tempoName = (tempo?: TempoId) =>
     tempo === 'lambat' ? t.tempoSlow : tempo === 'eja' ? t.tempoWordByWord : t.tempoNormal;
@@ -224,14 +222,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                   <RotateCcw className="w-3.5 h-3.5" />
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleDownload(item)}
-                  className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors cursor-pointer"
-                  title={t.downloadWavBtn}
-                >
-                  <Download className="w-3.5 h-3.5" />
-                </button>
+                <DownloadButtons audioBase64={item.audioBase64} meta={metaOf(item)} t={t} />
               </div>
             </div>
           );
