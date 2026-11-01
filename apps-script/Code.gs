@@ -21,10 +21,10 @@
 
 // ID folder Google Drive tujuan. Boleh ID-nya saja atau seluruh alamat folder, contoh:
 // https://drive.google.com/drive/folders/INI_ID_FOLDERNYA
-var FOLDER_ID = 'TEMPEL_ID_FOLDER_DI_SINI';
+var FOLDER_ID = '13x7t0ma8X1oA2MixvJqLLk98bFIZCCnC';
 
 // Kunci rahasia: buat sendiri, minimal 16 karakter acak (huruf & angka). Jangan dibagikan.
-var KUNCI_RAHASIA = 'GANTI_DENGAN_KUNCI_RAHASIA_ANDA';
+var KUNCI_RAHASIA = 'naatiqHrw@123456';
 
 // ------------------------------------------------------------
 // Tidak perlu mengubah apa pun di bawah baris ini.
