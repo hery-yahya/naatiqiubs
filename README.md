@@ -137,6 +137,62 @@ Label judul, tokoh/suara, dan keterangan lengkap ikut tersimpan di dalam file MP
 Encoder MP3 memakai [lamejs](https://github.com/zhuker/lamejs), port JavaScript dari
 [LAME](https://lame.sourceforge.io) (lisensi LGPL). File aslinya disimpan tanpa diubah di `public/vendor/`.
 
+## Koleksi Audio (Google Drive)
+
+Guru menyimpan audio ke **folder Google Drive sekolah**, lalu murid mendengarkan lewat link
+(bisa dibuka siapa saja yang menerima link, tanpa sandi aplikasi). Di aplikasi ada tab **Koleksi**
+berisi daftar audio, tombol **Putar**, **Salin link**, **WhatsApp**, dan **Hapus** (khusus guru).
+
+- **Menyimpan & menghapus** hanya untuk guru (perlu **sandi guru**).
+- **Melihat daftar Koleksi** di aplikasi perlu sandi aplikasi biasa.
+- Audio disimpan sebagai **MP3** (dengan label judul/tokoh/keterangan), bisa dikelompokkan per **folder/kelas**.
+- **Hapus** = file dipindah ke **Sampah Google Drive** (masih bisa dipulihkan dari Drive selama 30 hari).
+- Tidak memakai kartu kredit: penyimpanan memakai kuota Google Drive Anda (gratis 15 GB).
+
+### Cara memasang Koleksi Audio (sekali saja, ± 10 menit)
+
+**A. Siapkan folder Google Drive**
+1. Buka <https://drive.google.com> dengan akun sekolah, buat folder baru, misalnya `Koleksi Nāṭiq`.
+2. Buka folder itu. Salin **ID folder** dari alamat di browser:
+   `https://drive.google.com/drive/folders/`**`1AbC...xyz`** ← bagian setelah `folders/`.
+
+**B. Pasang skrip Apps Script**
+1. Buka <https://script.google.com> → **Proyek baru**. Beri nama, misalnya `Nāṭiq Koleksi`.
+2. Hapus semua isi `Code.gs`, lalu **tempel seluruh isi** file [`apps-script/Code.gs`](apps-script/Code.gs) dari repo ini.
+3. Di bagian atas skrip, isi:
+   - `FOLDER_ID` = ID folder dari langkah A.
+   - `KUNCI_RAHASIA` = kata rahasia buatan Anda, minimal 16 huruf/angka acak (contoh: `naatiq7Xq2mP9vLk4Rz`).
+4. Klik **Simpan** (ikon disket).
+5. Klik **Deploy → Deployment baru** → ikon roda gigi → pilih **Aplikasi web**:
+   - **Jalankan sebagai:** Saya
+   - **Yang memiliki akses:** Siapa saja
+6. Klik **Deploy** → **Izinkan akses** → pilih akun Google → (kalau muncul peringatan "Google belum memverifikasi
+   aplikasi ini", klik **Lanjutan** → **Buka Nāṭiq Koleksi (tidak aman)** — ini aman karena skripnya milik Anda sendiri)
+   → **Izinkan**.
+7. Salin **URL aplikasi web** (berakhiran `/exec`).
+
+**C. Pasang di Cloudflare** (Worker `naatiqiubs` → Settings → Variables and Secrets → Add, jenis **Secret**):
+
+| Key | Value |
+|---|---|
+| `DRIVE_SCRIPT_URL` | URL aplikasi web dari langkah B.7 |
+| `DRIVE_SCRIPT_TOKEN` | `KUNCI_RAHASIA` yang sama persis dengan di skrip |
+| `TEACHER_PASSWORD` | sandi guru (berbeda dari sandi aplikasi; jangan dibagikan ke murid) |
+
+Setelah deploy selesai, buka aplikasi → tab **Koleksi**. Masuk sebagai guru dengan sandi guru,
+lalu di Studio buat audio dan klik **Simpan ke Koleksi**.
+
+**Kalau skrip diubah nanti:** Deploy → **Kelola deployment** → ikon pensil → Versi: **Versi baru** → Deploy
+(URL tetap sama, tidak perlu mengubah Cloudflare).
+
+| Pesan error | Yang dilakukan |
+|---|---|
+| Koleksi Audio belum diatur | Pasang `DRIVE_SCRIPT_URL` dan `DRIVE_SCRIPT_TOKEN` di Cloudflare |
+| Kunci rahasia tidak cocok | Samakan `DRIVE_SCRIPT_TOKEN` dengan `KUNCI_RAHASIA` di skrip |
+| Apps Script tidak membalas dengan benar | Pastikan URL berakhiran `/exec` dan akses "Siapa saja" |
+| FOLDER_ID belum diisi / Folder tidak ditemukan | Periksa `FOLDER_ID` di skrip, lalu buat **Versi baru** deployment |
+| Sandi guru belum dipasang | Tambahkan `TEACHER_PASSWORD` di Cloudflare |
+
 ## Rencana pengembangan
 
 - [x] Langkah 1 — Online di Cloudflare, pesan error jelas, tanpa audio palsu
@@ -145,8 +201,7 @@ Encoder MP3 memakai [lamejs](https://github.com/zhuker/lamejs), port JavaScript 
 - [x] Langkah 4 — **Dialog dua tokoh** (tetap ada mode Monolog), ekspresi per baris
 - [x] Langkah 5 — Ekspresi lebih konsisten (arahan Gemini singkat)
 - [x] Langkah 6 — **Unduh MP3** (selain WAV), dibuat di browser
-- [ ] **Koleksi Audio** — audio disimpan di Cloudflare sehingga bisa dibuka dari perangkat mana pun
-      (guru membuat, murid mendengarkan dari HP masing-masing)
+- [x] Langkah 7 — **Koleksi Audio** di Google Drive (guru menyimpan, murid mendengarkan lewat link)
 
 ---
 
@@ -157,9 +212,12 @@ wrangler.jsonc        ← pengaturan Cloudflare Worker
 server/worker.ts      ← pintu masuk: /api/* ke server, sisanya ke tampilan
 server/gemini.ts      ← cara memanggil Gemini + pesan error
 server/auth.ts        ← pemeriksaan sandi masuk (APP_PASSWORD)
+server/koleksi.ts     ← jembatan ke Google Apps Script + sandi guru
+apps-script/Code.gs   ← skrip Google Apps Script (ditempel di script.google.com)
 server/routes/        ← fungsi server (memanggil Gemini)
   status.ts             cek apakah kunci API & sandi sudah terpasang
   login.ts              periksa sandi dari layar masuk
+  koleksi.ts            daftar / simpan / hapus audio di Koleksi (Google Drive)
   tts-generate.ts       teks → suara (1 gaya)
   tts-compare-all.ts    teks → suara (3 gaya sekaligus)
   tts-dialog.ts         dialog 2 tokoh → satu audio

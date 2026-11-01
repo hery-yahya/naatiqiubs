@@ -13,6 +13,8 @@ import {
   Volume2,
   KeyRound,
   MessagesSquare,
+  Library,
+  AudioLines,
   User,
   X,
 } from 'lucide-react';
@@ -27,6 +29,8 @@ import { AiAssistantModal } from './components/AiAssistantModal';
 import { LoginScreen } from './components/LoginScreen';
 import { DialogPanel, dialogErrorMessage } from './components/DialogPanel';
 import { DIALOG_SAMPLES, parseDialog } from './utils/dialog';
+import { KoleksiView } from './components/KoleksiView';
+import { SaveToKoleksiModal } from './components/SaveToKoleksiModal';
 import {
   TTSStyleId,
   STYLE_CONFIGS,
@@ -41,6 +45,9 @@ import {
   clearStoredPassword,
   getStoredPassword,
   verifyPassword,
+  getTeacherPassword,
+  clearTeacherPassword,
+  TEACHER_CHANGED_EVENT,
 } from './utils/api';
 import { addHistoryItem, clearHistoryStore, loadHistory, MAX_HISTORY_ITEMS } from './utils/history-store';
 
@@ -113,6 +120,19 @@ export default function App() {
   } | null>(null);
 
   const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
+
+  // Tab utama: Studio (membuat suara) atau Koleksi (audio tersimpan di Google Drive)
+  const [activeTab, setActiveTab] = useState<'studio' | 'koleksi'>('studio');
+  const [koleksiEnabled, setKoleksiEnabled] = useState(false);
+  const [teacherPasswordSet, setTeacherPasswordSet] = useState(false);
+  const [isTeacher, setIsTeacher] = useState<boolean>(() => Boolean(getTeacherPassword()));
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+
+  useEffect(() => {
+    const onTeacherChanged = () => setIsTeacher(Boolean(getTeacherPassword()));
+    window.addEventListener(TEACHER_CHANGED_EVENT, onTeacherChanged);
+    return () => window.removeEventListener(TEACHER_CHANGED_EVENT, onTeacherChanged);
+  }, []);
   const [activeModel, setActiveModel] = useState<string>(TTS_MODEL);
 
   // Save language to localStorage
@@ -146,6 +166,8 @@ export default function App() {
         if (cancelled) return;
         if (data.status === 'ok') {
           setHasApiKey(data.hasKey);
+          setKoleksiEnabled(Boolean(data.koleksiEnabled));
+          setTeacherPasswordSet(Boolean(data.teacherPasswordSet));
           if (data.model) setActiveModel(data.model);
         }
         const needsPassword = Boolean(data.passwordRequired);
@@ -453,6 +475,41 @@ export default function App() {
           </div>
         )}
 
+        {/* Tab Studio / Koleksi */}
+        <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
+          {(
+            [
+              { id: 'studio', label: t.tabStudio, Icon: AudioLines },
+              { id: 'koleksi', label: t.tabKoleksi, Icon: Library },
+            ] as const
+          ).map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActiveTab(id)}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 border transition-colors cursor-pointer font-cairo ${
+                activeTab === id
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow'
+                  : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'koleksi' ? (
+          <KoleksiView
+            t={t}
+            language={language}
+            koleksiEnabled={koleksiEnabled}
+            teacherPasswordSet={teacherPasswordSet}
+            isTeacher={isTeacher}
+            onTeacherLogout={clearTeacherPassword}
+          />
+        ) : (
+        <>
         {/* 3 Styles Showcase Section (Arabic Fusha) */}
         <StyleSelector
           selectedStyle={selectedStyle}
@@ -597,6 +654,7 @@ export default function App() {
                 customDirective={currentAudio.customDirective}
                 timestamp={currentAudio.timestamp}
                 speakers={currentAudio.speakers}
+                onSaveToKoleksi={koleksiEnabled ? () => setIsSaveModalOpen(true) : undefined}
                 t={t}
                 language={language}
               />
@@ -664,7 +722,31 @@ export default function App() {
           t={t}
           language={language}
         />
+        </>
+        )}
       </main>
+
+      {/* Simpan ke Koleksi (Google Drive) */}
+      {currentAudio && (
+        <SaveToKoleksiModal
+          isOpen={isSaveModalOpen}
+          onClose={() => setIsSaveModalOpen(false)}
+          audioBase64={currentAudio.audioBase64}
+          meta={{
+            text: currentAudio.textSnippet,
+            styleId: currentAudio.styleId,
+            voiceName: currentAudio.voiceName,
+            tempo: currentAudio.tempo,
+            customDirective: currentAudio.customDirective,
+            timestamp: currentAudio.timestamp,
+            speakers: currentAudio.speakers,
+          }}
+          isTeacher={isTeacher}
+          teacherPasswordSet={teacherPasswordSet}
+          t={t}
+          language={language}
+        />
+      )}
 
       {/* AI Assistant Modal */}
       <AiAssistantModal

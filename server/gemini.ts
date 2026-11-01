@@ -19,6 +19,12 @@ export interface Env {
   GEMINI_API_KEY?: string;
   /** Sandi masuk aplikasi (Secret). Kalau kosong, aplikasi terbuka tanpa sandi. */
   APP_PASSWORD?: string;
+  /** Sandi guru (Secret): wajib untuk menyimpan/menghapus audio di Koleksi. */
+  TEACHER_PASSWORD?: string;
+  /** URL aplikasi web Google Apps Script (jembatan ke Google Drive). */
+  DRIVE_SCRIPT_URL?: string;
+  /** Kunci rahasia yang sama dengan KUNCI_RAHASIA di Apps Script. */
+  DRIVE_SCRIPT_TOKEN?: string;
   ASSETS?: { fetch(request: Request): Promise<Response> };
 }
 

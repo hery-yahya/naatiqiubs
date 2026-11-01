@@ -8,3 +8,8 @@ GEMINI_API_KEY="tempel-kunci-api-gemini-di-sini"
 
 # Sandi masuk aplikasi (opsional). Kosongkan/hapus baris ini untuk membuka tanpa sandi.
 APP_PASSWORD="sandi-percobaan"
+
+# Koleksi Audio (opsional): lihat bagian "Koleksi Audio" di README.
+TEACHER_PASSWORD="sandi-guru-percobaan"
+DRIVE_SCRIPT_URL="https://script.google.com/macros/s/XXXX/exec"
+DRIVE_SCRIPT_TOKEN="kunci-rahasia-yang-sama-dengan-di-apps-script"
