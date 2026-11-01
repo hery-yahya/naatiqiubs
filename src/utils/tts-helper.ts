@@ -10,12 +10,14 @@ export type TempoId = 'normal' | 'lambat' | 'eja';
 
 export const TEMPO_IDS: TempoId[] = ['normal', 'lambat', 'eja'];
 
+/**
+ * Arahan tempo untuk Gemini. Sengaja singkat dan berbahasa Inggris, sesuai saran
+ * dokumentasi Gemini TTS (arahan panjang justru membuat suara melenceng).
+ */
 export const TEMPO_DIRECTIVES: Record<TempoId, string> = {
   normal: '',
-  lambat:
-    'تحدث ببطء وبوضوح تام، بإيقاع هادئ مناسب للمتعلمين المبتدئين، مع نطق كل حرف من مخرجه. (speaking slowly and clearly)',
-  eja:
-    'تحدث ببطء شديد كلمةً كلمةً، وانطق كل كلمة بوضوح تام مع وقفة قصيرة بعد كل كلمة، كمعلم يملي على طلاب مبتدئين. (speaking very slowly, word by word)',
+  lambat: 'speaking slowly and clearly',
+  eja: 'speaking very slowly, word by word',
 };
 
 export function isTempoId(value: unknown): value is TempoId {
@@ -49,7 +51,10 @@ export interface TTSStyleConfig {
   nameArabic: string;
   badge: string;
   description: string;
+  /** Penjelasan gaya dalam bahasa Arab (dipakai untuk Asisten AI penulis naskah) */
   directive: string;
+  /** Arahan singkat berbahasa Inggris yang dikirim ke Gemini TTS */
+  ttsStyle: string;
   sampleText: string;
   accentColor: string;
   bgGradient: string;
@@ -111,6 +116,7 @@ export const STYLE_CONFIGS: Record<TTSStyleId, TTSStyleConfig> = {
     badge: 'طبيعي وهادئ',
     description: 'إلقاء هادئ ومتزن باللغة العربية الفصحى، مناسب للمحادثات، البودكاست الثقافي، والكتب المسموعة.',
     directive: 'تحدث باللغة العربية الفصحى السليمة بنبرة محايدة، هادئة، متزنة، ومخارج حروف واضحة ونطق عربي فصيح وطبيعي.',
+    ttsStyle: 'calm, clear and natural',
     sampleText: 'أَهْلًا وَسَهْلًا بِكُمْ فِي تَطْبِيقِ نَاطِقٍ لِتَحْوِيلِ النَّصِّ إِلَى صَوْتٍ فَصِيحٍ، حَيْثُ نَسْعَى لِتَقْدِيمِ تَجْرِبَةٍ صَوْتِيَّةٍ عَرَبِيَّةٍ رَائِعَةٍ.',
     accentColor: 'text-emerald-400',
     bgGradient: 'from-emerald-500/10 via-teal-500/5 to-transparent',
@@ -124,6 +130,7 @@ export const STYLE_CONFIGS: Record<TTSStyleId, TTSStyleConfig> = {
     badge: 'فرح وحماسي',
     description: 'نبرة مفعمة بالفرح والسرور والحماس والابتسامة، مثالية للتهاني، الإعلانات التشويقية، والقصص الحيوية.',
     directive: 'تحدث باللغة العربية الفصحى بنبرة مبهجة للغاية، مشرقة، مفعمة بالفرح والسرور والحماس والطاقة الإيجابية مع ابتسامة واضحة في نبرة الصوت!',
+    ttsStyle: 'cheerful and enthusiastic, smiling',
     sampleText: 'مَرْحَبًا بِكُمْ جَمِيعًا! يُسْعِدُنَا جِدًّا أَنْ نُعْلِنَ لَكُمُ الْيَوْمَ عَنْ هَذَا الْإِنْجَازِ الرَّائِعِ، أَلْفُ مَبْرُوكٍ لِلْجَمِيعِ وَدَامَتْ أَيَّامُكُمْ أَفْرَاحًا!',
     accentColor: 'text-amber-400',
     bgGradient: 'from-amber-500/10 via-orange-500/5 to-transparent',
@@ -137,6 +144,7 @@ export const STYLE_CONFIGS: Record<TTSStyleId, TTSStyleConfig> = {
     badge: 'وقور وفصيح',
     description: 'نبرة مذيع نشرات الأخبار التلفزيونية الرسمية، إلقاء جهوري وقور، إيقاع رصين ودقة تامة في الضبط والتشكيل.',
     directive: 'تحدث باللغة العربية الفصحى بنبرة مذيع نشرة أخبار تلفزيونية رسمية، وقورة، رصينة، ذات إلقاء جهوري متقن ومخارج حروف عربية دقيقة ونبرة إخبارية موثوقة.',
+    ttsStyle: 'formal news anchor, authoritative and measured',
     sampleText: 'سَيِّدَاتِي وَسَادَتِي، طَابَتْ أَوْقَاتُكُمْ. إِلَيْكُمُ النَّشْرَةَ الْإِخْبَارِيَّةَ الْمُفَصَّلَةَ، حَيْثُ أَعْلَنَتِ الْجِهَاتُ الْمَعْنِيَّةُ الْيَوْمَ عَنْ حُزْمَةٍ جَدِيدَةٍ مِنَ الْمَشَارِيعِ التَّنْمَوِيَّةِ.',
     accentColor: 'text-indigo-400',
     bgGradient: 'from-indigo-500/10 via-purple-500/5 to-transparent',
@@ -173,20 +181,25 @@ export function validateTtsInput(text: string, maxChars = 2000): ValidationResul
   return { isValid: true, charCount, wordCount };
 }
 
+/**
+ * Susun arahan gaya untuk Gemini: gaya (atau ekspresi baris) + tempo + ekspresi tambahan.
+ * - expressionStyle: kalau diisi (ekspresi per baris dialog), MENGGANTIKAN gaya umum
+ *   agar tidak bertabrakan, misalnya gaya "ceria" dengan ekspresi "berbisik".
+ */
 export function buildSpeechDirective(
   styleId: TTSStyleId,
   customStylePrompt?: string,
-  tempo: TempoId = 'normal'
+  tempo: TempoId = 'normal',
+  expressionStyle?: string
 ): string {
-  let directive = STYLE_CONFIGS[styleId]?.directive || STYLE_CONFIGS.netral.directive;
-  if (customStylePrompt && customStylePrompt.trim()) {
-    directive = `${directive}. توجيهات إضافية: ${customStylePrompt.trim()}`;
-  }
+  const parts: string[] = [];
+  const expr = (expressionStyle || '').trim();
+  parts.push(expr || STYLE_CONFIGS[styleId]?.ttsStyle || STYLE_CONFIGS.netral.ttsStyle);
   const tempoDirective = TEMPO_DIRECTIVES[tempo] || '';
-  if (tempoDirective) {
-    directive = `${directive} ${tempoDirective}`;
-  }
-  return directive;
+  if (tempoDirective) parts.push(tempoDirective);
+  const custom = (customStylePrompt || '').trim();
+  if (custom) parts.push(custom);
+  return parts.join('; ');
 }
 
 export function estimateSpeechDurationSeconds(text: string, speedMultiplier = 1): number {

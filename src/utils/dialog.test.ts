@@ -73,3 +73,13 @@ test('setLineExpression adds, replaces and removes expressions', async () => {
   assert.deepEqual(parseDialog(sanitized.script).errors, []);
   assert.deepEqual(parseDialog(script).sourceLines, [0, 1]);
 });
+
+test('expressionToStyle maps presets (Arabic with/without harakat, Indonesian, English) and keeps custom text', async () => {
+  const { expressionToStyle } = await import('./dialog');
+  assert.equal(expressionToStyle('هامسًا').tag, '<whispering>');
+  assert.ok(expressionToStyle('هامسا').style.startsWith('whispering'));
+  assert.ok(expressionToStyle('Berbisik').style.startsWith('whispering'));
+  assert.ok(expressionToStyle('loud').style.startsWith('loud'));
+  assert.equal(expressionToStyle('بفرح').tag, undefined);
+  assert.deepEqual(expressionToStyle('بشوق'), { style: 'بشوق' });
+});

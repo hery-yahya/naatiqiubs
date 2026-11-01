@@ -138,26 +138,52 @@ export interface ExpressionPreset {
   id: string;
   en: string;
   emoji: string;
+  /** Arahan singkat berbahasa Inggris yang dikirim ke Gemini untuk baris ini */
+  style: string;
+  /** Tanda khusus Gemini yang disisipkan di awal baris (opsional) */
+  tag?: string;
 }
 
 export const EXPRESSION_PRESETS: ExpressionPreset[] = [
-  { ar: 'بفرح', id: 'Gembira', en: 'Happy', emoji: '😊' },
-  { ar: 'بحماس', id: 'Semangat', en: 'Excited', emoji: '🔥' },
-  { ar: 'بتعجب', id: 'Heran', en: 'Surprised', emoji: '😮' },
-  { ar: 'مستفهمًا', id: 'Bertanya', en: 'Asking', emoji: '❓' },
-  { ar: 'بتردد', id: 'Ragu', en: 'Hesitant', emoji: '🤔' },
-  { ar: 'بهدوء', id: 'Tenang', en: 'Calm', emoji: '😌' },
-  { ar: 'بلطف', id: 'Lembut', en: 'Gentle', emoji: '🤗' },
-  { ar: 'بحزن', id: 'Sedih', en: 'Sad', emoji: '😢' },
-  { ar: 'بقلق', id: 'Cemas', en: 'Worried', emoji: '😟' },
-  { ar: 'بخوف', id: 'Takut', en: 'Afraid', emoji: '😨' },
-  { ar: 'بغضب', id: 'Marah', en: 'Angry', emoji: '😠' },
-  { ar: 'معتذرًا', id: 'Minta maaf', en: 'Apologetic', emoji: '🙏' },
-  { ar: 'بفخر', id: 'Bangga', en: 'Proud', emoji: '😎' },
-  { ar: 'ضاحكًا', id: 'Tertawa', en: 'Laughing', emoji: '😄' },
-  { ar: 'هامسًا', id: 'Berbisik', en: 'Whispering', emoji: '🤫' },
-  { ar: 'بصوت عالٍ', id: 'Lantang', en: 'Loud', emoji: '📢' },
+  { ar: 'بفرح', id: 'Gembira', en: 'Happy', emoji: '😊', style: 'happy and joyful, smiling while speaking' },
+  { ar: 'بحماس', id: 'Semangat', en: 'Excited', emoji: '🔥', style: 'excited and energetic' },
+  { ar: 'بتعجب', id: 'Heran', en: 'Surprised', emoji: '😮', style: 'surprised and amazed' },
+  { ar: 'مستفهمًا', id: 'Bertanya', en: 'Asking', emoji: '❓', style: 'asking a question, curious, rising intonation' },
+  { ar: 'بتردد', id: 'Ragu', en: 'Hesitant', emoji: '🤔', style: 'hesitant and unsure, slightly halting' },
+  { ar: 'بهدوء', id: 'Tenang', en: 'Calm', emoji: '😌', style: 'calm and relaxed, soft and steady' },
+  { ar: 'بلطف', id: 'Lembut', en: 'Gentle', emoji: '🤗', style: 'gentle and kind, warm and soft' },
+  { ar: 'بحزن', id: 'Sedih', en: 'Sad', emoji: '😢', style: 'sad and sorrowful, subdued' },
+  { ar: 'بقلق', id: 'Cemas', en: 'Worried', emoji: '😟', style: 'worried and anxious' },
+  { ar: 'بخوف', id: 'Takut', en: 'Afraid', emoji: '😨', style: 'scared and fearful, voice trembling slightly' },
+  { ar: 'بغضب', id: 'Marah', en: 'Angry', emoji: '😠', style: 'angry and irritated, firm and sharp' },
+  { ar: 'معتذرًا', id: 'Minta maaf', en: 'Apologetic', emoji: '🙏', style: 'apologetic and sincere, soft' },
+  { ar: 'بفخر', id: 'Bangga', en: 'Proud', emoji: '😎', style: 'proud and confident' },
+  { ar: 'ضاحكًا', id: 'Tertawa', en: 'Laughing', emoji: '😄', style: 'laughing while speaking, amused', tag: '<laugh>' },
+  {
+    ar: 'هامسًا',
+    id: 'Berbisik',
+    en: 'Whispering',
+    emoji: '🤫',
+    style: 'whispering very softly and quietly, hushed and breathy for the whole line',
+    tag: '<whispering>',
+  },
+  { ar: 'بصوت عالٍ', id: 'Lantang', en: 'Loud', emoji: '📢', style: 'loud and projecting, almost shouting' },
 ];
+
+/**
+ * Terjemahkan ekspresi baris menjadi arahan untuk Gemini.
+ * Ekspresi dari tombol (Arab, atau namanya dalam Indonesia/Inggris) memakai arahan yang sudah disiapkan;
+ * ekspresi bebas dikirim apa adanya.
+ */
+export function expressionToStyle(expression: string): { style: string; tag?: string } {
+  const raw = expression.trim();
+  const key = normalizeName(raw);
+  const preset = EXPRESSION_PRESETS.find(
+    (p) => normalizeName(p.ar) === key || p.id.toLowerCase() === key || p.en.toLowerCase() === key
+  );
+  if (preset) return { style: preset.style, ...(preset.tag ? { tag: preset.tag } : {}) };
+  return { style: raw };
+}
 
 /** Nomor baris (mulai 0) tempat posisi kursor berada. */
 export function lineIndexAt(script: string, offset: number): number {

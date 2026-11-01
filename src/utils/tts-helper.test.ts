@@ -54,13 +54,17 @@ test('validateTtsInput checks empty and Arabic string bounds', () => {
   assert.equal(overflowRes.isValid, false);
 });
 
-test('buildSpeechDirective merges Arabic base directive and custom prompt', () => {
-  const baseNetral = buildSpeechDirective('netral');
-  assert.ok(baseNetral.includes('العربية الفصحى'));
-
-  const withCustom = buildSpeechDirective('gembira', 'بنبرة فرح طفولي');
-  assert.ok(withCustom.includes('مبهجة'));
-  assert.ok(withCustom.includes('بنبرة فرح طفولي'));
+test('buildSpeechDirective builds a short style, with expression replacing the base style', () => {
+  assert.equal(buildSpeechDirective('netral'), 'calm, clear and natural');
+  assert.equal(
+    buildSpeechDirective('gembira', 'بنبرة فرح طفولي'),
+    'cheerful and enthusiastic, smiling; بنبرة فرح طفولي'
+  );
+  assert.equal(
+    buildSpeechDirective('gembira', undefined, 'lambat', 'whispering softly'),
+    'whispering softly; speaking slowly and clearly'
+  );
+  assert.ok(buildSpeechDirective('formal_berita').length < 80);
 });
 
 test('isArabicText correctly detects Arabic characters', () => {
