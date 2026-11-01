@@ -11,6 +11,8 @@ interface VoiceAndSettingsProps {
   customDirective: string;
   onChangeCustomDirective: (val: string) => void;
   activeStyle: TTSStyleId;
+  /** false = sembunyikan pilihan suara (mode dialog memilih suara per tokoh) */
+  showVoices?: boolean;
   t: TranslationSchema;
   language: AppLanguage;
 }
@@ -23,6 +25,7 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
   customDirective,
   onChangeCustomDirective,
   activeStyle,
+  showVoices = true,
   t,
   language,
 }) => {
@@ -40,6 +43,7 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
   return (
     <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4 space-y-4">
       {/* Voice selection */}
+      {showVoices && (
       <div>
         <div
           className={`flex items-center justify-between mb-2 ${
@@ -110,9 +114,11 @@ export const VoiceAndSettings: React.FC<VoiceAndSettingsProps> = ({
         </div>
       </div>
 
+      )}
+
       {/* Speed & Advanced Controls bar */}
       <div
-        className={`flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-800/80 ${
+        className={`flex flex-wrap items-center justify-between gap-3 ${showVoices ? 'pt-2 border-t border-zinc-800/80' : ''} ${
           isArabicUI ? 'flex-row-reverse' : ''
         }`}
       >

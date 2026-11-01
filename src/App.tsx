@@ -12,6 +12,8 @@ import {
   Loader2,
   Volume2,
   KeyRound,
+  MessagesSquare,
+  User,
   X,
 } from 'lucide-react';
 import { Header } from './components/Header';
@@ -23,6 +25,8 @@ import { ComparisonMatrix, ComparisonResult } from './components/ComparisonMatri
 import { HistoryList, HistoryItem } from './components/HistoryList';
 import { AiAssistantModal } from './components/AiAssistantModal';
 import { LoginScreen } from './components/LoginScreen';
+import { DialogPanel, dialogErrorMessage } from './components/DialogPanel';
+import { DIALOG_SAMPLES, parseDialog } from './utils/dialog';
 import {
   TTSStyleId,
   STYLE_CONFIGS,
@@ -58,6 +62,27 @@ export default function App() {
   const [selectedStyle, setSelectedStyle] = useState<TTSStyleId>('netral');
   const [selectedVoice, setSelectedVoice] = useState<string>('Kore');
   const [text, setText] = useState<string>(STYLE_CONFIGS.netral.sampleText);
+
+  // Mode naskah: monolog (satu suara) atau dialog (dua tokoh)
+  const [mode, setMode] = useState<'monolog' | 'dialog'>(() => {
+    try {
+      return localStorage.getItem('naatiq_mode') === 'dialog' ? 'dialog' : 'monolog';
+    } catch {
+      return 'monolog';
+    }
+  });
+  const [dialogScript, setDialogScript] = useState<string>(DIALOG_SAMPLES[0].script);
+  const [dialogVoices, setDialogVoices] = useState<[string, string]>(DIALOG_SAMPLES[0].voices);
+  const parsedDialog = parseDialog(dialogScript);
+
+  const handleChangeMode = (next: 'monolog' | 'dialog') => {
+    setMode(next);
+    try {
+      localStorage.setItem('naatiq_mode', next);
+    } catch {
+      // abaikan
+    }
+  };
   const [tempo, setTempo] = useState<TempoId>('normal');
   const [customDirective, setCustomDirective] = useState<string>('');
 
@@ -75,6 +100,7 @@ export default function App() {
     tempo?: TempoId;
     customDirective?: string;
     timestamp: number;
+    speakers?: { name: string; voiceName: string }[];
   } | null>(null);
 
   const [comparisonResults, setComparisonResults] = useState<ComparisonResult[] | null>(null);
@@ -155,7 +181,71 @@ export default function App() {
     setAuthState('locked');
   };
 
+  const handleGenerateDialog = async () => {
+    setErrorMessage(null);
+    setShowQuotaBanner(false);
+    if (parsedDialog.errors.length > 0) {
+      setErrorMessage(
+        `${t.dialogFixErrors} ${parsedDialog.errors.map((e) => dialogErrorMessage(e, t)).join(' ')}`
+      );
+      return;
+    }
+
+    const speakers = parsedDialog.names.map((name, i) => ({ name, voiceName: dialogVoices[i] }));
+    setIsGenerating(true);
+    try {
+      const { res, data } = await apiPost('/api/tts/dialog', {
+        speakers,
+        lines: parsedDialog.lines,
+        styleId: selectedStyle,
+        tempo,
+        customDirective: customDirective.trim() || undefined,
+      });
+      if (!res.ok || !data.success) {
+        if (data.isQuota) setShowQuotaBanner(true);
+        throw new Error(data.error || 'Gagal membuat suara dialog.');
+      }
+
+      const createdAt = Date.now();
+      const usedTempo = (data.tempo as TempoId) || tempo;
+      const usedCustomDirective = customDirective.trim() || undefined;
+      const usedSpeakers: { name: string; voiceName: string }[] = data.speakers || speakers;
+
+      setCurrentAudio({
+        audioBase64: data.audioBase64,
+        styleId: data.styleId as TTSStyleId,
+        voiceName: usedSpeakers[0]?.voiceName || dialogVoices[0],
+        textSnippet: data.text,
+        tempo: usedTempo,
+        customDirective: usedCustomDirective,
+        timestamp: createdAt,
+        speakers: usedSpeakers,
+      });
+
+      const newHistoryEntry: HistoryItem = {
+        id: createdAt.toString(),
+        timestamp: createdAt,
+        text: data.text,
+        styleId: data.styleId as TTSStyleId,
+        voiceName: usedSpeakers[0]?.voiceName || dialogVoices[0],
+        audioBase64: data.audioBase64,
+        tempo: usedTempo,
+        customDirective: usedCustomDirective,
+        mode: 'dialog',
+        speakers: usedSpeakers,
+      };
+      setHistory((prev) => [newHistoryEntry, ...prev].slice(0, MAX_HISTORY_ITEMS));
+      addHistoryItem(newHistoryEntry);
+    } catch (err: any) {
+      console.error(err);
+      setErrorMessage(err.message || 'Gagal menghubungi server.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleGenerate = async () => {
+    if (mode === 'dialog') return handleGenerateDialog();
     setErrorMessage(null);
     setShowQuotaBanner(false);
     const validation = validateTtsInput(text);
@@ -376,14 +466,52 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Left Column: Script input & Generation actions */}
           <div className="lg:col-span-7 space-y-4">
-            <TextInputPanel
-              text={text}
-              onChangeText={setText}
-              activeStyle={selectedStyle}
-              onOpenAiAssistant={() => setIsAiModalOpen(true)}
-              t={t}
-              language={language}
-            />
+            {/* Pilihan mode: Monolog / Dialog */}
+            <div className={`flex items-center gap-2 ${isArabicUI ? 'flex-row-reverse' : ''}`}>
+              <span className="text-xs text-zinc-400 font-cairo">{t.modeLabel}</span>
+              <div className="inline-flex rounded-lg bg-zinc-900 p-0.5 border border-zinc-800">
+                {(
+                  [
+                    { id: 'monolog', label: t.modeMonolog, Icon: User },
+                    { id: 'dialog', label: t.modeDialog, Icon: MessagesSquare },
+                  ] as const
+                ).map(({ id, label, Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => handleChangeMode(id)}
+                    className={`px-3 py-1.5 text-xs rounded-md font-semibold flex items-center gap-1.5 transition-colors cursor-pointer font-cairo ${
+                      mode === id ? 'bg-indigo-600 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {mode === 'dialog' ? (
+              <DialogPanel
+                script={dialogScript}
+                onChangeScript={setDialogScript}
+                parsed={parsedDialog}
+                voices={dialogVoices}
+                onChangeVoices={setDialogVoices}
+                onOpenAiAssistant={() => setIsAiModalOpen(true)}
+                t={t}
+                language={language}
+              />
+            ) : (
+              <TextInputPanel
+                text={text}
+                onChangeText={setText}
+                activeStyle={selectedStyle}
+                onOpenAiAssistant={() => setIsAiModalOpen(true)}
+                t={t}
+                language={language}
+              />
+            )}
 
             {/* Action Buttons */}
             <div
@@ -412,12 +540,13 @@ export default function App() {
                   <>
                     <Wand2 className="w-4 h-4" />
                     <span>
-                      {t.generateVoiceBtn} {activeStyleName}
+                      {mode === 'dialog' ? `${t.generateDialogBtn} • ${activeStyleName}` : `${t.generateVoiceBtn} ${activeStyleName}`}
                     </span>
                   </>
                 )}
               </button>
 
+              {mode === 'monolog' && (
               <button
                 type="button"
                 onClick={handleCompareAll}
@@ -437,6 +566,7 @@ export default function App() {
                   </>
                 )}
               </button>
+              )}
             </div>
           </div>
 
@@ -450,6 +580,7 @@ export default function App() {
               customDirective={customDirective}
               onChangeCustomDirective={setCustomDirective}
               activeStyle={selectedStyle}
+              showVoices={mode === 'monolog'}
               t={t}
               language={language}
             />
@@ -465,6 +596,7 @@ export default function App() {
                 tempo={currentAudio.tempo}
                 customDirective={currentAudio.customDirective}
                 timestamp={currentAudio.timestamp}
+                speakers={currentAudio.speakers}
                 t={t}
                 language={language}
               />
@@ -511,12 +643,24 @@ export default function App() {
               tempo: item.tempo,
               customDirective: item.customDirective,
               timestamp: item.timestamp,
+              speakers: item.mode === 'dialog' ? item.speakers : undefined,
             });
             setSelectedStyle(item.styleId);
-            setSelectedVoice(item.voiceName);
+            if (item.mode !== 'dialog') setSelectedVoice(item.voiceName);
             if (item.tempo) setTempo(item.tempo);
           }}
-          onLoadTextToEditor={(newText) => setText(newText)}
+          onLoadTextToEditor={(item) => {
+            if (item.mode === 'dialog') {
+              handleChangeMode('dialog');
+              setDialogScript(item.text);
+              if (item.speakers && item.speakers.length === 2) {
+                setDialogVoices([item.speakers[0].voiceName, item.speakers[1].voiceName]);
+              }
+            } else {
+              handleChangeMode('monolog');
+              setText(item.text);
+            }
+          }}
           t={t}
           language={language}
         />
@@ -527,7 +671,8 @@ export default function App() {
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
         activeStyle={selectedStyle}
-        onApplyScript={(newScript) => setText(newScript)}
+        onApplyScript={(newScript) => (mode === 'dialog' ? setDialogScript(newScript) : setText(newScript))}
+        mode={mode}
         t={t}
         language={language}
       />
