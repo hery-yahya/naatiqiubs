@@ -67,6 +67,20 @@ Aplikasi **tidak pernah** membuat suara pengganti palsu. Kalau gagal, yang muncu
 
 Catatan kuota: tombol **"Bandingkan 3 Gaya"** memakai kuota 3 kali dalam sekali klik.
 
+## Nama suara
+
+Agar familiar bagi murid, suara bawaan Gemini diberi nama Arab (yang dikirim ke Gemini tetap nama aslinya):
+
+| Nama di aplikasi | Suara Gemini | Karakter |
+|---|---|---|
+| Zaid (زيد) | Fenrir | Pria, berwibawa, bass dalam |
+| Musa (موسى) | Puck | Pria, ceria, energik |
+| Yasir (ياسر) | Charon | Pria, tenang, mendalam |
+| Maryam (مريم) | Kore | Wanita, hangat, jernih |
+| Zainab (زينب) | Zephyr | Wanita, cerah, elegan |
+
+Riwayat lama yang dibuat sebelum penggantian nama otomatis tampil dengan nama baru.
+
 ## Tempo bicara
 
 | Pilihan | Cara kerja | Cocok untuk |
@@ -116,8 +130,8 @@ Setiap audio mencatat: penggalan teks, suara, gaya ekspresi, ekspresi tambahan (
 tempo bicara, serta tanggal dan jam pembuatan.
 
 - **Nama file** contohnya:
-  `Naatiq_2026-11-01_0636_Kore-Wanita_Gembira_Lambat-Jeda_أهلا-وسهلا-بكم.wav`
-  atau untuk dialog: `Naatiq_2026-11-01_0940_Dialog-Puck-Charon_Netral_Normal_أحمد-السلام-عليكم.wav`
+  `Naatiq_2026-11-01-0636_Maryam-Wanita_Gembira_Lambat-Jeda_أهلا-وسهلا-بكم.wav`
+  atau untuk dialog: `Naatiq_2026-11-01-0940_Dialog-Musa-Yasir_Netral_Normal_أحمد-السلام-عليكم.wav`
   (tanggal di depan supaya file tersusun urut waktu di folder).
 - **Di dalam file WAV** tersimpan label judul, suara, dan keterangan lengkap (termasuk teks utuh).
   Label ini tampil di pemutar musik seperti VLC, dan di Properties/Info file.
@@ -146,6 +160,8 @@ berisi daftar audio, tombol **Putar**, **Salin link**, **WhatsApp**, dan **Hapus
 - **Menyimpan & menghapus** hanya untuk guru (perlu **sandi guru**).
 - **Melihat daftar Koleksi** di aplikasi perlu sandi aplikasi biasa.
 - Audio disimpan sebagai **MP3** (dengan label judul/tokoh/keterangan), bisa dikelompokkan per **folder/kelas**.
+- **Judul bawaan** saat menyimpan sama dengan nama file unduhan (dipisah spasi), misalnya
+  `Naatiq 2026-11-01-1441 Zaid-Pria Formal-Berita Normal مرحبا بكم في درس`. Judul bisa diubah sebelum disimpan.
 - **Hapus** = file dipindah ke **Sampah Google Drive** (masih bisa dipulihkan dari Drive selama 30 hari).
 - Tidak memakai kartu kredit: penyimpanan memakai kuota Google Drive Anda (gratis 15 GB).
 

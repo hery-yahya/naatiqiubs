@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, CloudUpload, Loader2, Check, Link2, Share2, ExternalLink } from 'lucide-react';
 import { TranslationSchema, AppLanguage } from '../utils/i18n';
 import { apiPost } from '../utils/api';
-import { AudioMeta, buildDescription, bytesToBase64, makeMp3, textSnippet } from '../utils/audio-meta';
+import { AudioMeta, buildDescription, buildKoleksiTitle, bytesToBase64, makeMp3 } from '../utils/audio-meta';
 import { copyText, shareToWhatsApp } from '../utils/share';
 import { TeacherLogin } from './TeacherLogin';
 import type { KoleksiItem } from './KoleksiView';
@@ -39,16 +39,10 @@ function rememberFolder(folder: string): void {
   }
 }
 
-function pad(n: number): string {
-  return n.toString().padStart(2, '0');
-}
-
-/** Nama file di Drive: "<judul> (2026-11-01 13.30).mp3" */
-function driveFileName(title: string, ts: number): string {
-  const d = new Date(ts);
-  const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}.${pad(d.getMinutes())}`;
-  const clean = title.replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) || 'Naatiq';
-  return `${clean} (${stamp}).mp3`;
+/** Nama file di Drive = judul + ".mp3" (karakter yang tidak boleh di nama file dibersihkan). */
+function driveFileName(title: string): string {
+  const clean = title.replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150) || 'Naatiq';
+  return `${clean}.mp3`;
 }
 
 export const SaveToKoleksiModal: React.FC<SaveToKoleksiModalProps> = ({
@@ -75,7 +69,7 @@ export const SaveToKoleksiModal: React.FC<SaveToKoleksiModalProps> = ({
     const folders = loadRecentFolders();
     setRecent(folders);
     setFolder(folders[0] || '');
-    setTitle(textSnippet(meta.text, 6).replace(/…$/, ''));
+    setTitle(buildKoleksiTitle(meta));
     setSaved(null);
     setError(null);
     setCopied(false);
@@ -93,7 +87,7 @@ export const SaveToKoleksiModal: React.FC<SaveToKoleksiModalProps> = ({
         '/api/koleksi/save',
         {
           base64: bytesToBase64(mp3),
-          fileName: driveFileName(title, meta.timestamp),
+          fileName: driveFileName(title),
           folder: folder.trim(),
           description: buildDescription(meta),
         },
@@ -188,7 +182,7 @@ export const SaveToKoleksiModal: React.FC<SaveToKoleksiModalProps> = ({
                 dir="auto"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                maxLength={100}
+                maxLength={150}
                 className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-indigo-500"
               />
             </label>

@@ -154,7 +154,7 @@ export const DialogPanel: React.FC<DialogPanelProps> = ({
     const v = AVAILABLE_VOICES.find((x) => x.id === id);
     if (!v) return id;
     const gender = v.gender.includes('أنثى') ? t.voiceFemale : t.voiceMale;
-    return `${v.name} — ${gender}`;
+    return `${v.name} (${v.nameArabic}) — ${gender}`;
   };
 
   return (

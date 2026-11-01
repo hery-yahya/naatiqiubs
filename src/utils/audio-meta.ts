@@ -8,7 +8,7 @@
  *    terlihat di pemutar musik dan di Properties/Info file.
  */
 
-import { STYLE_CONFIGS, TTSStyleId, TempoId, AVAILABLE_VOICES } from './tts-helper';
+import { STYLE_CONFIGS, TTSStyleId, TempoId, AVAILABLE_VOICES, voiceDisplayName } from './tts-helper';
 import { wavToMp3, withId3 } from './mp3';
 
 export interface AudioMeta {
@@ -68,9 +68,10 @@ function pad(n: number): string {
   return n.toString().padStart(2, '0');
 }
 
+/** Tanggal-jam untuk nama file, mis. "2026-11-01-1441". */
 function stamp(ts: number): string {
   const d = new Date(ts);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
 }
 
 /** Ubah teks menjadi potongan aman untuk nama file. */
@@ -84,15 +85,11 @@ function slug(text: string, maxLen: number): string {
     .replace(/-+$/, '');
 }
 
-/**
- * Nama file unduhan:
- * Naatiq_<tanggal>_<jam>_<suara>_<gaya>_<tempo>[_ekspresi-...]_<penggalan teks>.wav
- * Tanggal di depan agar file tersusun urut waktu; teks Arab di akhir agar tampilan nama tetap rapi.
- */
-export function buildFileName(meta: AudioMeta, ext = 'wav'): string {
+/** Bagian-bagian nama audio: Naatiq, tanggal-jam, suara, gaya, tempo, [ekspresi], penggalan teks. */
+function nameParts(meta: AudioMeta, snippetJoiner: string): string[] {
   const v = AVAILABLE_VOICES.find((x) => x.id === meta.voiceName);
   const voicePart = isDialog(meta)
-    ? `Dialog-${(meta.speakers || []).map((s) => s.voiceName).join('-')}`
+    ? `Dialog-${(meta.speakers || []).map((s) => voiceDisplayName(s.voiceName)).join('-')}`
     : v
     ? `${v.name}-${v.gender.includes('أنثى') ? 'Wanita' : 'Pria'}`
     : slug(meta.voiceName, 20);
@@ -105,8 +102,26 @@ export function buildFileName(meta: AudioMeta, ext = 'wav'): string {
   ];
   const custom = (meta.customDirective || '').trim();
   if (custom) parts.push(`ekspresi-${slug(textSnippet(custom, 3), 24)}`);
-  parts.push(slug(textSnippet(meta.text), 40) || 'audio');
-  return `${parts.filter(Boolean).join('_')}.${ext}`;
+  const snippet = slug(textSnippet(meta.text), 40) || 'audio';
+  parts.push(snippetJoiner === '-' ? snippet : snippet.replace(/-/g, snippetJoiner));
+  return parts.filter(Boolean);
+}
+
+/**
+ * Nama file unduhan:
+ * Naatiq_<tanggal-jam>_<suara>_<gaya>_<tempo>[_ekspresi-...]_<penggalan teks>.wav
+ * Tanggal di depan agar file tersusun urut waktu; teks Arab di akhir agar tampilan nama tetap rapi.
+ */
+export function buildFileName(meta: AudioMeta, ext = 'wav'): string {
+  return `${nameParts(meta, '-').join('_')}.${ext}`;
+}
+
+/**
+ * Judul bawaan saat menyimpan ke Koleksi (isi yang sama dengan nama file unduhan, dipisah spasi), mis.
+ * "Naatiq 2026-11-01-1441 Zaid-Pria Formal-Berita Normal مرحبا بكم في درس"
+ */
+export function buildKoleksiTitle(meta: AudioMeta): string {
+  return nameParts(meta, ' ').join(' ');
 }
 
 /** Waktu yang mudah dibaca, misalnya "1 Nov 2026, 06.36". */
